@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="JPDevSlayer - Portafolio profesional de desarrollo. Creación de videojuegos inmersivos, páginas web ultra-modernas, aplicaciones y programas de alto rendimiento.">
+    <meta name="keywords" content="JPDevSlayer, videojuegos, páginas web, desarrollo web, aplicaciones, programador, tauri, unity, react, portafolio futurista">
+    <meta name="author" content="JPDevSlayer">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="JPDevSlayer | Portafolio de Desarrollo y Videojuegos">
+    <meta property="og:description" content="Forja tu imperio digital. Desarrollo de videojuegos, páginas web, programas y aplicaciones de alto rendimiento.">
+    <meta property="og:image" content="assets/logo.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="JPDevSlayer | Portafolio de Desarrollo y Videojuegos">
+    <meta property="twitter:description" content="Forja tu imperio digital. Desarrollo de videojuegos, páginas web, programas y aplicaciones de alto rendimiento.">
+    <meta property="twitter:image" content="assets/logo.jpg">
+
+    <title>JPDevSlayer | Portafolio de Desarrollo y Videojuegos</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Orbitron:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Scanline overlay to simulate CRT screen (Cyberpunk feel) -->
+    <div class="crt-overlay"></div>
+
+    <!-- Custom sound control floating button -->
+    <button class="sound-toggle-btn" id="soundToggle" aria-label="Activar Sonido" title="Activar/Desactivar efectos de sonido">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sound-off-icon"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><line x1="22" y1="9" x2="16" y2="15"></line><line x1="16" y1="9" x2="22" y2="15"></line></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sound-on-icon d-none"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+    </button>
+
+    <!-- Navigation Header -->
+    <header class="navbar" id="navbar">
+        <div class="nav-container">
+            <!-- Left links (hidden on mobile, flex on desktop) -->
+            <div class="nav-left">
+                <a href="#hero" class="nav-link active">INICIO</a>
+                <span class="nav-divider">|</span>
+                <a href="#services" class="nav-link">SERVICIOS</a>
+                <span class="nav-divider">|</span>
+                <a href="#projects" class="nav-link">PROYECTOS</a>
+                <span class="nav-divider">|</span>
+                <a href="#skills" class="nav-link">HABILIDADES</a>
+            </div>
+
+            <!-- Center hanging shield with user logo -->
+            <div class="nav-center">
+                <a href="#hero" class="nav-logo-shield" aria-label="Volver al inicio">
+                    <img src="assets/logo.png" alt="JPDevSlayer Logo" class="shield-logo">
+                </a>
+            </div>
+
+            <!-- Right button (hidden on mobile, flex on desktop) -->
+            <div class="nav-right">
+                <a href="#contact" class="nav-pill-btn">INICIAR PROYECTO</a>
+            </div>
+
+            <!-- Mobile Toggle -->
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Abrir Menú">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <!-- Mobile Menu Dropdown -->
+            <nav class="nav-menu" id="navMenu">
+                <a href="#hero" class="nav-link active">INICIO</a>
+                <a href="#services" class="nav-link">SERVICIOS</a>
+                <a href="#projects" class="nav-link">PROYECTOS</a>
+                <a href="#skills" class="nav-link">HABILIDADES</a>
+                <a href="#contact" class="nav-link nav-btn">INICIAR PROYECTO</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section with Animated Canvas Background -->
+    <section id="hero" class="hero-section">
+        <canvas id="particleCanvas" class="hero-canvas"></canvas>
+        <div class="hero-container">
+            <div class="hero-logo-box animate-pulse">
+                <img src="assets/logo.png" alt="Logo de JPDevSlayer" class="hero-logo">
+                <div class="hero-logo-glow"></div>
+            </div>
+            
+            <div class="hero-text-content">
+                <h2 class="hero-tagline">FORGE YOUR DIGITAL EMPIRE</h2>
+                <h1 class="hero-title">JPDevSlayer</h1>
+                <p class="hero-subtitle">INNOVATIVE SOLUTIONS FOR TOMORROW</p>
+                <div class="hero-separator">
+                    <span class="line"></span>
+                    <span class="slash"></span>
+                    <span class="line"></span>
+                </div>
+                <p class="hero-description">Desarrollo de primer nivel de videojuegos inmersivos, páginas web de última generación, aplicaciones inteligentes y programas de alto rendimiento.</p>
+                
+                <div class="hero-cta-buttons">
+                    <a href="#services" class="btn btn-primary">EXPLORAR ARSENAL</a>
+                    <a href="#contact" class="btn btn-outline">ESTABLECER CONEXIÓN</a>
+                </div>
+            </div>
+        </div>
+        <div class="hero-scroll-indicator">
+            <span>SCROLL DOWN</span>
+            <div class="mouse-icon">
+                <span class="wheel"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section (Bento Glassmorphic Layout) -->
+    <section id="services" class="services-section section-padding">
+        <div class="container">
+            <div class="section-header text-center">
+                <div class="section-badge">MODULOS DE DESARROLLO</div>
+                <h2 class="section-title">SERVICIOS DE INGENIERÍA</h2>
+                <div class="title-underline"></div>
+            </div>
+
+            <div class="services-grid">
+                <!-- Card 1: Web Pages -->
+                <div class="service-card animate-scroll">
+                    <div class="card-glow"></div>
+                    <div class="card-image-wrapper">
+                        <img src="assets/web_sphere.jpg" alt="Esfera 3D Web" class="service-sphere-img">
+                    </div>
+                    <div class="card-content">
+                        <span class="service-subtitle">WEB ARCHITECTURE</span>
+                        <h3 class="service-title">PÁGINAS WEB ULTRA-MODERNAS</h3>
+                        <p class="service-description">Sitios web inmersivos y cinematográficos construidos bajo estándares actuales de diseño y rendimiento de 2026. Interfaces fluidas que se adaptan a cualquier dispositivo.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#contact" class="btn btn-service-pill" data-service="Páginas Web">CONSTRUIR LA WEB</a>
+                    </div>
+                </div>
+
+                <!-- Card 2: Games -->
+                <div class="service-card featured animate-scroll">
+                    <div class="card-glow"></div>
+                    <div class="card-image-wrapper">
+                        <img src="assets/game_sphere.jpg" alt="Esfera 3D Videojuegos" class="service-sphere-img">
+                    </div>
+                    <div class="card-content">
+                        <span class="service-subtitle">GAME DEVELOPMENT</span>
+                        <h3 class="service-title">VIDEOJUEGOS INMERSIVOS</h3>
+                        <p class="service-description">Creación de mundos virtuales y experiencias interactivas en motores líderes como Unity y Unreal Engine. Optimización para PC, consolas, móviles y WebGL.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#contact" class="btn btn-service-pill" data-service="Videojuegos">CREAR MUNDOS</a>
+                    </div>
+                </div>
+
+                <!-- Card 3: Apps & Programs -->
+                <div class="service-card animate-scroll">
+                    <div class="card-glow"></div>
+                    <div class="card-image-wrapper">
+                        <img src="assets/app_sphere.jpg" alt="Esfera 3D Aplicaciones" class="service-sphere-img">
+                    </div>
+                    <div class="card-content">
+                        <span class="service-subtitle">APPLICATION ENGINEERING</span>
+                        <h3 class="service-title">APLICACIONES Y PROGRAMAS</h3>
+                        <p class="service-description">Desarrollo de software de escritorio robusto y aplicaciones móviles eficientes. Soluciones a medida con arquitecturas escalables y alto rendimiento.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#contact" class="btn btn-service-pill" data-service="Programas y Aplicaciones">DESPLEGAR SOFTWARE</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Portfolio Section -->
+    <section id="projects" class="projects-section section-padding">
+        <div class="container">
+            <div class="section-header text-center">
+                <div class="section-badge">REGISTRO DE COMBATE</div>
+                <h2 class="section-title">PROYECTOS EJECUTADOS</h2>
+                <div class="title-underline"></div>
+            </div>
+
+            <!-- Filters -->
+            <div class="portfolio-filters">
+                <button class="filter-btn active" data-filter="all">TODOS</button>
+                <button class="filter-btn" data-filter="web">WEB</button>
+                <button class="filter-btn" data-filter="games">VIDEOJUEGOS</button>
+                <button class="filter-btn" data-filter="apps">APPS & PROGRAMAS</button>
+            </div>
+
+            <!-- Projects Grid -->
+            <div class="projects-grid" id="projectsGrid">
+                <!-- Project 1: Game Dev -->
+                <div class="project-card animate-scroll" data-category="games">
+                    <div class="project-image-box">
+                        <div class="project-overlay">
+                            <span class="project-tech">UNITY // C# // SHADERS</span>
+                        </div>
+                        <!-- Generating inline canvas particles fallback in CSS or mock image -->
+                        <div class="project-mock-img games-bg">
+                            <div class="game-controller-icon">🎮</div>
+                        </div>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-meta">VIDEOJUEGO DE ACCIÓN</span>
+                        <h3 class="project-title">PROJECT VORTEX</h3>
+                        <p class="project-desc">Un videojuego de naves espaciales en 3D desarrollado en Unity con shader graphs personalizados para escudos cibernéticos, logrando 60fps en dispositivos móviles.</p>
+                        <div class="project-stats">
+                            <span>RENDER: WebGL/Mobile</span>
+                            <span>STATUS: COMPLETADO</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2: Web Dev -->
+                <div class="project-card animate-scroll" data-category="web">
+                    <div class="project-image-box">
+                        <div class="project-overlay">
+                            <span class="project-tech">VANILLA JS // WEBGL // HSL</span>
+                        </div>
+                        <div class="project-mock-img web-bg">
+                            <div class="web-globe-icon">🌐</div>
+                        </div>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-meta">SITIO WEB INTERACTIVO</span>
+                        <h3 class="project-title">NEON NEST DASHBOARD</h3>
+                        <p class="project-desc">Plataforma web interactiva para visualización de métricas en tiempo real mediante efectos de refracción de luz en tarjetas de cristal líquido y animaciones fluidas.</p>
+                        <div class="project-stats">
+                            <span>OPTIMIZACIÓN: 100/100</span>
+                            <span>STATUS: PRODUCCIÓN</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3: App Dev -->
+                <div class="project-card animate-scroll" data-category="apps">
+                    <div class="project-image-box">
+                        <div class="project-overlay">
+                            <span class="project-tech">RUST // TAURI // POSTGRESQL</span>
+                        </div>
+                        <div class="project-mock-img apps-bg">
+                            <div class="app-terminal-icon">🛡️</div>
+                        </div>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-meta">SOFTWARE DE ESCRITORIO</span>
+                        <h3 class="project-title">AEGIS SHIELD UTILITY</h3>
+                        <p class="project-desc">Aplicación de seguridad local multiplataforma (Windows/Linux) ligera construida con Rust y Tauri para encriptación de bases de datos locales.</p>
+                        <div class="project-stats">
+                            <span>PESO BUNDLE: < 4MB</span>
+                            <span>STATUS: EN DESARROLLO</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 4: Game Dev -->
+                <div class="project-card animate-scroll" data-category="games">
+                    <div class="project-image-box">
+                        <div class="project-overlay">
+                            <span class="project-tech">C++ // UNREAL ENGINE // HLSL</span>
+                        </div>
+                        <div class="project-mock-img unreal-bg">
+                            <div class="game-controller-icon">⚡</div>
+                        </div>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-meta">VIDEOJUEGO DE AVENTURAS</span>
+                        <h3 class="project-title">CHRONO SLAYER</h3>
+                        <p class="project-desc">Demo jugable en Unreal Engine 5 con mecánicas avanzadas de manipulación del tiempo escritas en C++, utilizando Niagara para efectos visuales futuristas.</p>
+                        <div class="project-stats">
+                            <span>ENGINE: Unreal 5</span>
+                            <span>STATUS: ALPHA</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section (Interactive Core) -->
+    <section id="skills" class="skills-section section-padding">
+        <div class="container">
+            <div class="section-header text-center">
+                <div class="section-badge">MATRIZ DE CAPACIDADES</div>
+                <h2 class="section-title">HABILIDADES DE INGENIERÍA</h2>
+                <div class="title-underline"></div>
+            </div>
+
+            <div class="skills-container">
+                <!-- Skill core representing the engine -->
+                <div class="skills-core-wrapper">
+                    <div class="skills-core">
+                        <img src="assets/logo.png" alt="Logo JPDevSlayer" class="skills-core-logo animate-pulse">
+                        <div class="skills-core-orbit"></div>
+                        <div class="skills-core-status">SLAYER CORE ACTIVE</div>
+                    </div>
+                </div>
+
+                <!-- Skill categories Grid -->
+                <div class="skills-categories">
+                    <!-- Frontend Skills -->
+                    <div class="skills-category-card">
+                        <h3 class="category-title">DESARROLLO FRONTEND</h3>
+                        <div class="skills-list">
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">JavaScript</span>
+                                    <span class="skill-percentage">95%</span>
+                                </div>
+                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 95%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">React.js</span>
+                                    <span class="skill-percentage">90%</span>
+                                </div>
+                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 90%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">HTML5</span>
+                                    <span class="skill-percentage">95%</span>
+                                </div>
+                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 95%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">CSS3</span>
+                                    <span class="skill-percentage">90%</span>
+                                </div>
+                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 90%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">Bootstrap</span>
+                                    <span class="skill-percentage">85%</span>
+                                </div>
+                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 85%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">Jest (Testing)</span>
+                                    <span class="skill-percentage">80%</span>
+                                </div>
+                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 80%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Backend & Tools Skills -->
+                    <div class="skills-category-card">
+                        <h3 class="category-title">BACKEND & INFRAESTRUCTURA</h3>
+                        <div class="skills-list">
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">Python</span>
+                                    <span class="skill-percentage">90%</span>
+                                </div>
+                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 90%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">Flask</span>
+                                    <span class="skill-percentage">85%</span>
+                                </div>
+                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 85%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">Restful APIs</span>
+                                    <span class="skill-percentage">90%</span>
+                                </div>
+                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 90%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">SQL (Bases de Datos)</span>
+                                    <span class="skill-percentage">85%</span>
+                                </div>
+                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 85%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">SQLAlchemy</span>
+                                    <span class="skill-percentage">80%</span>
+                                </div>
+                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 80%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">JSON Web Token (JWT)</span>
+                                    <span class="skill-percentage">85%</span>
+                                </div>
+                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 85%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-info">
+                                    <span class="skill-name">GitHub / Git</span>
+                                    <span class="skill-percentage">90%</span>
+                                </div>
+                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 90%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section (Cyber Data Transfer Portal) -->
+    <section id="contact" class="contact-section section-padding">
+        <div class="container">
+            <div class="section-header text-center">
+                <div class="section-badge">COMUNICACIÓN CON ENCRIPTACIÓN</div>
+                <h2 class="section-title">INICIAR CANAL DE DATOS</h2>
+                <div class="title-underline"></div>
+            </div>
+
+            <div class="contact-box animate-scroll">
+                <div class="contact-terminal-header">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-title">JPDevSlayer_SECURE_PORTAL.exe</span>
+                </div>
+                
+                <form class="contact-form" id="contactForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="name" class="terminal-label">>> IDENTIDAD / NOMBRE</label>
+                            <input type="text" id="name" required placeholder="Escribe tu nombre..." class="terminal-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="terminal-label">>> CANAL DE RESPUESTA / EMAIL</label>
+                            <input type="email" id="email" required placeholder="tu@correo.com" class="terminal-input">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="projectType" class="terminal-label">>> TIPO DE PROYECTO</label>
+                        <select id="projectType" class="terminal-input terminal-select">
+                            <option value="default" disabled selected>Selecciona un módulo...</option>
+                            <option value="web">Páginas Web Ultra-Modernas</option>
+                            <option value="games">Desarrollo de Videojuego</option>
+                            <option value="apps">Programa o Aplicación de Escritorio/Móvil</option>
+                            <option value="other">Otro Requerimiento Tecnológico</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message" class="terminal-label">>> DETALLES DE LA MISIÓN / MENSAJE</label>
+                        <textarea id="message" rows="5" required placeholder="Describe los detalles de tu proyecto..." class="terminal-input"></textarea>
+                    </div>
+
+                    <div class="terminal-status-log" id="statusLog">
+                        <span class="status-line">>> Esperando entrada del operador...</span>
+                    </div>
+
+                    <div class="form-footer">
+                        <button type="submit" class="btn btn-primary btn-submit">
+                            <span class="btn-text">INICIAR TRANSFERENCIA DE DATOS</span>
+                            <span class="btn-scan"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="footer-logo-wrapper">
+                        <img src="assets/logo.png" alt="Logo de JPDevSlayer" class="footer-logo">
+                    </div>
+                    <span class="footer-brand-name">JPDevSlayer</span>
+                </div>
+                <div class="footer-socials">
+                    <a href="https://github.com" target="_blank" aria-label="GitHub" class="social-link">GITHUB</a>
+                    <a href="https://linkedin.com" target="_blank" aria-label="LinkedIn" class="social-link">LINKEDIN</a>
+                    <a href="https://discord.com" target="_blank" aria-label="Discord" class="social-link">DISCORD</a>
+                </div>
+            </div>
+            
+            <div class="footer-separator"></div>
+
+            <div class="footer-bottom">
+                <p class="copyright">&copy; 2026 JPDevSlayer. TODOS LOS DERECHOS RESERVADOS. CÓDIGO AUTÓNOMO EJECUTADO.</p>
+                <div class="footer-metrics">
+                    <span class="metric"><span class="dot green"></span> SYSTEM STATUS: OPERATIONAL</span>
+                    <span class="metric">LOAD: 12%</span>
+                    <span class="metric">UPTIME: 99.98%</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
