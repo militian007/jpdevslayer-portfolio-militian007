@@ -458,9 +458,10 @@ const projectData = {
         ],
         tech: ["HTML5", "CSS3 Moderno", "JavaScript ES6", "Supabase Auth", "PostgreSQL DB", "RLS Security", "Vercel Deploy"],
         images: [
-            { src: "assets/math_1.png", caption: "Pantalla de acceso seguro (Login) con opciones de demo rápida." },
-            { src: "assets/math_2.png", caption: "Panel de control de la profesora: gestión de alumnos y asignación de notas." },
-            { src: "assets/math_17.png", caption: "Vista previa del portal SigmaMath desplegado en producción por Vercel." }
+            { src: "assets/math_1.png", caption: "Portal de acceso seguro (Login) con credenciales y accesos demo rápidos." },
+            { src: "assets/math_2.png", caption: "Módulo de gestión académica: registro de nuevos alumnos y asignación de calificaciones." },
+            { src: "assets/math_3.png", caption: "Dashboard financiero: métricas en tiempo real, gráfico de ingresos y distribución de cobros." },
+            { src: "assets/math_4.png", caption: "Panel de auditoría: tabla de control de pagos y verificación manual de recibos." }
         ]
     },
     vortex: {
