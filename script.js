@@ -433,8 +433,311 @@ contactForm.addEventListener('submit', (e) => {
     printNextLog();
 });
 
+/* ==========================================================================
+   PROJECT DETAILS MODAL & INTERACTIVE CAROUSEL SYSTEM
+   ========================================================================== */
+
+const projectData = {
+    sigma: {
+        title: "SIGMA MATH PORTAL",
+        subtitle: "Sistema Web de Gestión y Finanzas",
+        meta: "DESARROLLO WEB // BASE DE DATOS // ENCRIPTACIÓN",
+        stats: {
+            "Cliente": "Prof. Diana Matson",
+            "Estado": "<span class='status-pill'><span class='dot'></span> COMPLETADO & PAGADO</span>",
+            "Base de Datos": "Supabase (PostgreSQL)",
+            "Autenticación": "Supabase Auth"
+        },
+        description: "Un portal académico y administrativo diseñado a medida para simplificar y automatizar el control de alumnos, asistencia, calificaciones y registro de pagos mensuales de clases particulares. La aplicación cuenta con un doble acceso de roles (profesora y alumnos) y está conectada en tiempo real a una base de datos segura.",
+        features: [
+            "<strong>Doble Interfaz Adaptativa:</strong> Panel privado para la profesora (gestión académica/financiera) y portal para estudiantes (notas, asistencia y pagos).",
+            "<strong>Control de Asistencia Diario:</strong> Grid interactivo que calcula automáticamente el porcentaje global de asistencia de cada estudiante.",
+            "<strong>Carga de Recibos Drag-and-Drop:</strong> Módulo interactivo de carga de archivos multimedia para comprobar pagos.",
+            "<strong>Dashboard Financiero Avanzado:</strong> Panel administrativo con métricas, gráficos de líneas SVG para ingresos a lo largo del tiempo y gráfico de dona de distribución.",
+            "<strong>Seguridad con Row Level Security (RLS):</strong> Políticas en PostgreSQL que aseguran que los estudiantes solo accedan a sus propios datos."
+        ],
+        tech: ["HTML5", "CSS3 Moderno", "JavaScript ES6", "Supabase Auth", "PostgreSQL DB", "RLS Security", "Vercel Deploy"],
+        images: [
+            { src: "assets/math_1.png", caption: "Pantalla de acceso seguro (Login) con opciones de demo rápida." },
+            { src: "assets/math_2.png", caption: "Panel de control de la profesora: gestión de alumnos y asignación de notas." },
+            { src: "assets/math_17.png", caption: "Vista previa del portal SigmaMath desplegado en producción por Vercel." }
+        ]
+    },
+    vortex: {
+        title: "PROJECT VORTEX",
+        subtitle: "Videojuego de Naves Espaciales en 3D",
+        meta: "UNITY // DESARROLLO 3D // SHADERS",
+        stats: {
+            "Motor": "Unity 2025",
+            "Lenguaje": "C#",
+            "Render": "WebGL / Mobile URP",
+            "Estado": "Completado"
+        },
+        description: "Un videojuego arcade de naves espaciales en 3D de ritmo frenético. Cuenta con mecánicas de disparo dinámicas, generación procedimental de oleadas de enemigos y shaders de escudos cibernéticos optimizados para ejecutarse a 60fps constantes.",
+        features: [
+            "<strong>Shader Graph Personalizados:</strong> Escudos cibernéticos que reaccionan visualmente a los impactos de asteroides.",
+            "<strong>Control Optimizado:</strong> Soporte de mandos inalámbricos y controles táctiles giroscópicos móviles.",
+            "<strong>WebGL Output:</strong> Optimización de peso de build web para tiempos de carga inferiores a 5 segundos."
+        ],
+        tech: ["Unity Engine", "C# scripting", "Shader Graph", "URP Renderer", "WebGL", "Audio Mixers"],
+        images: [
+            { src: "assets/game_sphere.png", caption: "Render conceptual de la esfera cibernética de energía del juego." }
+        ]
+    },
+    dashboard: {
+        title: "NEON NEST DASHBOARD",
+        subtitle: "Visualizador WebGL de Métricas en Tiempo Real",
+        meta: "VANILLA JS // RENDIMIENTO // WEBGL",
+        stats: {
+            "Framework": "HTML5 / CSS3 Puro",
+            "Lenguaje": "JavaScript Vanilla",
+            "Rendimiento": "100/100 Lighthouse",
+            "Estado": "Producción"
+        },
+        description: "Un panel de control web inmersivo y responsivo para monitorización de datos. Implementa efectos avanzados de refracción de luz (glassmorphism) e interactividad con partículas en tiempo real sin librerías externas pesadas.",
+        features: [
+            "<strong>Spotlight Effects:</strong> Efecto de iluminación interactiva Bento Grid que sigue el movimiento del puntero.",
+            "<strong>Sound Synthesis:</strong> Generación de sonidos de interfaz mediante Web Audio API (sintetizador de frecuencias).",
+            "<strong>Lighthouse Optimization:</strong> Cero dependencias externas para lograr tiempos de carga instantáneos."
+        ],
+        tech: ["HTML5", "CSS Custom Variables", "Vanilla JavaScript", "Web Audio API", "HTML5 Canvas"],
+        images: [
+            { src: "assets/web_sphere.png", caption: "Ilustración de la esfera cibernética representando la interconexión web." }
+        ]
+    },
+    aegis: {
+        title: "AEGIS SHIELD UTILITY",
+        subtitle: "Software de Encriptación y Seguridad Local",
+        meta: "RUST // TAURI // MULTIPLATAFORMA",
+        stats: {
+            "Núcleo": "Rust (Seguridad de Memoria)",
+            "Frontend": "HTML/JS con Tauri",
+            "Peso Bundle": "&lt; 4 MB",
+            "Estado": "En Desarrollo"
+        },
+        description: "Una aplicación de escritorio ultraligera y segura para encriptar archivos y bases de datos locales mediante algoritmos criptográficos robustos, asegurando total privacidad de la información.",
+        features: [
+            "<strong>Multiplataforma:</strong> Compilado nativo para Windows y Linux usando Tauri.",
+            "<strong>Criptografía AES-GCM:</strong> Encriptación simétrica segura implementada directamente en Rust.",
+            "<strong>Consumo de RAM Mínimo:</strong> Consumo inferior a 15MB de memoria RAM en segundo plano."
+        ],
+        tech: ["Rust", "Tauri Framework", "PostgreSQL", "Criptografía AES", "Desktop Native API"],
+        images: [
+            { src: "assets/app_sphere.png", caption: "Render conceptual que ilustra la encriptación local y blindaje Aegis." }
+        ]
+    },
+    chrono: {
+        title: "CHRONO SLAYER",
+        subtitle: "Mecánicas de Manipulación de Tiempo",
+        meta: "UNREAL ENGINE 5 // C++ // NIAGARA FX",
+        stats: {
+            "Motor": "Unreal Engine 5",
+            "Lenguaje": "C++ Nativo",
+            "FX System": "Niagara Particles",
+            "Estado": "Etapa Alpha"
+        },
+        description: "Una demo técnica jugable en Unreal Engine 5 inspirada en mecánicas de manipulación del tiempo. Escrita principalmente en C++ para garantizar la máxima velocidad de procesamiento físico.",
+        features: [
+            "<strong>Time Dilated Physics:</strong> Control de tiempo individual para objetos del mundo y enemigos.",
+            "<strong>Niagara Visual FX:</strong> Efectos de distorsión espacio-temporal de alta fidelidad.",
+            "<strong>Optimización C++:</strong> Estructura de código nativa con mínima dependencia en Blueprints."
+        ],
+        tech: ["Unreal Engine 5", "C++", "Niagara FX", "Chaos Physics", "Materials & HLSL"],
+        images: [
+            { src: "assets/game_sphere.png", caption: "Esfera de energía temporal usada en el render de Chrono Slayer." }
+        ]
+    }
+};
+
+function initProjectModal() {
+    const modal = document.getElementById('projectModal');
+    const backdrop = document.getElementById('modalBackdrop');
+    const closeBtn = document.getElementById('modalCloseBtn');
+    const modalBody = document.getElementById('modalBody');
+    const modalTitle = document.getElementById('modalTitle');
+    const cards = document.querySelectorAll('.project-card');
+
+    if (!modal || !cards.length) return;
+
+    cards.forEach(card => {
+        card.addEventListener('click', () => {
+            const projectId = card.getAttribute('data-project-id');
+            const data = projectData[projectId];
+            
+            if (data) {
+                // Populate Modal Data
+                modalTitle.textContent = data.title;
+                
+                // Build Modal content
+                let imagesHTML = '';
+                let indicatorsHTML = '';
+                
+                data.images.forEach((img, index) => {
+                    imagesHTML += `
+                        <div class="carousel-slide">
+                            <img src="${img.src}" alt="${img.caption || data.title}">
+                            <div class="carousel-caption">
+                                <span>${img.caption || ''}</span>
+                                <span class="carousel-counter">${index + 1} / ${data.images.length}</span>
+                            </div>
+                        </div>
+                    `;
+                    indicatorsHTML += `
+                        <button class="carousel-dot ${index === 0 ? 'active' : ''}" data-slide="${index}" aria-label="Ir a diapositiva ${index + 1}"></button>
+                    `;
+                });
+
+                let statsHTML = '';
+                for (const [key, value] of Object.entries(data.stats)) {
+                    statsHTML += `
+                        <div class="meta-item">
+                            <span class="meta-label">${key}</span>
+                            <span class="meta-value">${value}</span>
+                        </div>
+                    `;
+                }
+
+                let featuresHTML = '';
+                data.features.forEach(f => {
+                    featuresHTML += `
+                        <li class="feature-list-item">
+                            <span class="feature-bullet">»</span>
+                            <span class="feature-text">${f}</span>
+                        </li>
+                    `;
+                });
+
+                let techHTML = '';
+                data.tech.forEach(t => {
+                    techHTML += `<span class="tech-badge">${t}</span>`;
+                });
+
+                modalBody.innerHTML = `
+                    <div class="modal-layout-grid">
+                        <div class="modal-visual-area">
+                            <div class="modal-carousel" id="modalCarousel">
+                                <div class="carousel-view">
+                                    <div class="carousel-track" id="carouselTrack" style="transform: translateX(0%);">
+                                        ${imagesHTML}
+                                    </div>
+                                    ${data.images.length > 1 ? `
+                                        <button class="carousel-btn prev" id="carouselPrevBtn" aria-label="Anterior">&lsaquo;</button>
+                                        <button class="carousel-btn next" id="carouselNextBtn" aria-label="Siguiente">&rsaquo;</button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            ${data.images.length > 1 ? `
+                                <div class="carousel-indicators" id="carouselIndicators">
+                                    ${indicatorsHTML}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="modal-details-area">
+                            <div>
+                                <span class="modal-subtitle">${data.meta}</span>
+                                <h4 style="font-family: var(--font-display); font-size: 1.1rem; color: white; margin-bottom: 1rem;">${data.subtitle}</h4>
+                                <p class="modal-description">${data.description}</p>
+                            </div>
+                            
+                            <div>
+                                <h5 class="modal-section-title">Detalles del Sistema</h5>
+                                <div class="modal-meta-grid">
+                                    ${statsHTML}
+                                </div>
+                            </div>
+
+                            <div>
+                                <h5 class="modal-section-title">Características Clave</h5>
+                                <ul class="features-list">
+                                    ${featuresHTML}
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h5 class="modal-section-title">Pila Tecnológica</h5>
+                                <div class="tech-badges-container">
+                                    ${techHTML}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Open Modal
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Lock background scrolling
+                
+                // Add sound effects to new buttons in modal
+                if (typeof attachSoundEffects === 'function') {
+                    attachSoundEffects();
+                }
+
+                // Initialize Carousel functionality
+                if (data.images.length > 1) {
+                    setupCarousel();
+                }
+            }
+        });
+    });
+
+    function setupCarousel() {
+        const track = document.getElementById('carouselTrack');
+        const prevBtn = document.getElementById('carouselPrevBtn');
+        const nextBtn = document.getElementById('carouselNextBtn');
+        const dots = document.querySelectorAll('.carousel-dot');
+        let currentIndex = 0;
+        const totalSlides = dots.length;
+
+        function updateCarousel(index) {
+            currentIndex = index;
+            // Move track
+            track.style.transform = `translateX(-${currentIndex * 100}%)`;
+            // Update dots
+            dots.forEach(dot => dot.classList.remove('active'));
+            dots[currentIndex].classList.add('active');
+        }
+
+        if (prevBtn && nextBtn) {
+            prevBtn.addEventListener('click', () => {
+                let index = currentIndex - 1;
+                if (index < 0) index = totalSlides - 1; // loop to end
+                updateCarousel(index);
+            });
+
+            nextBtn.addEventListener('click', () => {
+                let index = currentIndex + 1;
+                if (index >= totalSlides) index = 0; // loop to start
+                updateCarousel(index);
+            });
+        }
+
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                const index = parseInt(dot.getAttribute('data-slide'));
+                updateCarousel(index);
+            });
+        });
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = ''; // Unlock scrolling
+    }
+
+    // Close events
+    closeBtn.addEventListener('click', closeModal);
+    backdrop.addEventListener('click', closeModal);
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+}
+
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
     attachSoundEffects();
     highlightActiveLink();
+    initProjectModal();
 });
