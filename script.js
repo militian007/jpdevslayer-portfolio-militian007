@@ -464,6 +464,28 @@ const projectData = {
             { src: "assets/math_4.png", caption: "Panel de auditoría: tabla de control de pagos y verificación manual de recibos." }
         ]
     },
+    nexus: {
+        title: "NEXUS MOTOR ANALÍTICO",
+        subtitle: "Sistema Inteligente de Asistencia",
+        meta: "REACT // TAILWIND // VITE",
+        stats: {
+            "Cliente": "Saman y Orinokia",
+            "Estado": "<span class='status-pill'><span class='dot green'></span> PRODUCCIÓN</span>",
+            "Procesamiento": "XLSX Parsing Avanzado",
+            "Base de Datos": "Browser LocalStorage"
+        },
+        description: "Una aplicación web de alto rendimiento diseñada para procesar reportes biométricos generados por Hik-Connect. Transforma datos crudos de Excel en un panel analítico futurista que calcula retardo, puntualidad y detecta de forma inteligente omisiones de marcaje (entradas y salidas).",
+        features: [
+            "<strong>Algoritmo de Agrupación (Punch-Pairing):</strong> El sistema detecta inteligentemente si los empleados marcaron una o varias veces al día y agrupa los tiempos de entrada/salida automáticamente.",
+            "<strong>Dashboard Global:</strong> Panel superior interactivo que muestra las métricas de toda la compañía o de grupos específicos en tiempo real.",
+            "<strong>Diseño Futurista (Glassmorphism):</strong> Interfaz moderna con paneles semitransparentes, desenfoques de cristal y acentos de neón.",
+            "<strong>Omitir Empleados:</strong> Capacidad de filtrar directivos o personal que no requiere marcaje desde la pantalla de configuración."
+        ],
+        tech: ["React.js", "Vite", "Tailwind CSS", "SheetJS (XLSX)", "Lucide Icons", "Vercel Deploy"],
+        images: [
+            { src: "assets/web_sphere.jpg", caption: "Vista previa del Panel de Asistencia Inteligente con diseño Glassmorphism." }
+        ]
+    },
     vortex: {
         title: "PROJECT VORTEX",
         subtitle: "Videojuego de Naves Espaciales en 3D",
