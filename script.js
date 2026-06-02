@@ -483,7 +483,10 @@ const projectData = {
         ],
         tech: ["React.js", "Vite", "Tailwind CSS", "SheetJS (XLSX)", "Lucide Icons", "Vercel Deploy"],
         images: [
-            { src: "assets/web_sphere.jpg", caption: "Vista previa del Panel de Asistencia Inteligente con diseño Glassmorphism." }
+            { src: "assets/nexus_1.png", caption: "Pantalla inicial de NEXUS: Carga de reportes biométricos." },
+            { src: "assets/nexus_2.png", caption: "Dashboard Global: Métricas en tiempo real y tarjetas de asistencia con alertas." },
+            { src: "assets/nexus_3.png", caption: "Configuración Avanzada: Mapeo de columnas, tolerancia de horarios y omisión de empleados." },
+            { src: "assets/web_sphere.jpg", caption: "Diseño futurista basado en Glassmorphism." }
         ]
     },
     vortex: {
