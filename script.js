@@ -464,6 +464,31 @@ const projectData = {
             { src: "assets/math_4.png", caption: "Panel de auditoría: tabla de control de pagos y verificación manual de recibos." }
         ]
     },
+    bodega3: {
+        title: "BODEGA-3 SISTEMA ADMINISTRATIVO",
+        subtitle: "Plataforma de Gestión Comercial Multi-Usuario",
+        meta: "REACT // SUPABASE // TYPESCRIPT // VERCEL",
+        stats: {
+            "Cliente": "Bodega 3 (Venezuela)",
+            "Estado": "<span class='status-pill'><span class='dot green'></span> PRODUCCIÓN</span>",
+            "Base de Datos": "Supabase (PostgreSQL + RLS)",
+            "Autenticación": "Supabase Auth (multi-rol)"
+        },
+        description: "Aplicación web full-stack diseñada para digitalizar la operación completa de una bodega en Venezuela. Maneja inventario con 478 productos, registro de ventas, compras, cuentas por cobrar/pagar y dashboard analítico en tiempo real. Sistema multi-usuario con roles (admin/empleado) protegido con Row Level Security, conversión automática USD$/Bs con tasa BCV del día, e importación masiva de ventas del cuaderno desde Excel (validación contra stock y catálogo).",
+        features: [
+            "<strong>Inventario Inteligente:</strong> 478 productos categorizados con stock actual, valorizado a costo/venta, clasificación por rotación (cuartiles sobre 30 días) y alertas de stock bajo/crítico.",
+            "<strong>Importación Masiva desde Excel:</strong> Carga las ventas del día subiendo una plantilla .xlsx. El sistema valida cada fila contra el catálogo y el stock disponible, muestra advertencias en vivo y crea la venta con descuento automático de inventario vía triggers de PostgreSQL.",
+            "<strong>Multi-moneda con Tasa BCV:</strong> Todos los precios en USD$ con conversión automática a Bolívares usando la tasa oficial del día (editable desde el topbar, cacheada por fecha).",
+            "<strong>Dashboard Analítico:</strong> Resumen día/semana/mes con ventas, compras, utilidad bruta, ticket promedio, top 5 productos vendidos, alertas de stock bajo y gráfico de área ventas vs compras.",
+            "<strong>Multi-rol con RLS:</strong> Vendedores (empleado) cargan ventas, administradora (admin) revisa y aprueba, owner (admin) tiene acceso total. Row Level Security en PostgreSQL garantiza que cada usuario solo acceda a lo permitido.",
+            "<strong>UI Cyberpunk Responsive:</strong> Tema neón con paleta cian/magenta/verde, tipografía Orbitron + JetBrains Mono + Inter, animaciones fluidas, sidebar con menú hamburguesa móvil."
+        ],
+        tech: ["React 18", "Vite", "TypeScript", "Tailwind CSS", "Supabase (PostgreSQL)", "Supabase Auth", "Row Level Security", "PostgreSQL Triggers", "SheetJS (xlsx)", "Lucide Icons", "Vercel Deploy"],
+        images: [
+            { src: "assets/bodega_1.png", caption: "Dashboard principal: ventas del día ($101.21), top productos, gráfico ventas vs compras y alertas de stock." },
+            { src: "assets/bodega_2.png", caption: "Pantalla de login cyberpunk con branding BODEGA-3 y acceso seguro multi-rol." }
+        ]
+    },
     nexus: {
         title: "NEXUS MOTOR ANALÍTICO",
         subtitle: "Sistema Inteligente de Asistencia",
