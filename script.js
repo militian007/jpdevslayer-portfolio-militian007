@@ -486,6 +486,10 @@ const projectData = {
         tech: ["React 18", "Vite", "TypeScript", "Tailwind CSS", "Supabase (PostgreSQL)", "Supabase Auth", "Row Level Security", "PostgreSQL Triggers", "SheetJS (xlsx)", "Lucide Icons", "Vercel Deploy"],
         images: [
             { src: "assets/bodega_1.png", caption: "Dashboard principal: ventas del día ($101.21), top productos, gráfico ventas vs compras y alertas de stock." },
+            { src: "assets/bodega_3_inventario.png", caption: "Módulo de Inventario: 478 productos, valorizado a costo y venta, alertas de stock bajo y sin stock, filtros por rotación." },
+            { src: "assets/bodega_4_productos.png", caption: "Catálogo de Productos: tabla con código, nombre, categoría, costo, venta, margen y stock de los 478 productos." },
+            { src: "assets/bodega_5_ventas.png", caption: "Módulo de Ventas: registro de ventas con cliente, forma de pago, totales en USD$ y Bolívares, estado pagado." },
+            { src: "assets/bodega_6_importar.png", caption: "Importar Ventas: carga masiva desde Excel con drag&drop, descarga de plantilla con catálogo embebido." },
             { src: "assets/bodega_2.png", caption: "Pantalla de login cyberpunk con branding BODEGA-3 y acceso seguro multi-rol." }
         ]
     },
