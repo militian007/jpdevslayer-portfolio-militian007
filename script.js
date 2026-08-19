@@ -1,4 +1,32 @@
 /* ==========================================================================
+   >>> CONFIGURACIÓN DEL SITIO — LO ÚNICO QUE TIENES QUE EDITAR <<<
+   ==========================================================================
+
+   1) FORMSPREE_ID  (para recibir los mensajes del formulario en tu correo)
+      - Entra a https://formspree.io y crea una cuenta gratis.
+      - Crea un formulario nuevo ("+ New Form") y pon tu correo.
+      - Te dará una URL tipo:  https://formspree.io/f/xayzwqbk
+      - Copia SOLO la última parte (ej: xayzwqbk) y pégala abajo.
+      - El plan gratis permite 50 mensajes al mes.
+      Mientras diga "PEGA-AQUI", el formulario le avisará al visitante y le
+      ofrecerá WhatsApp o correo como canal alterno.
+
+   2) WHATSAPP  (botón flotante + canal alterno del formulario)
+      - Tu número en formato internacional, SOLO DÍGITOS, sin +, sin espacios.
+      - Ejemplos:  Venezuela '584121234567'  ·  España '34600112233'
+      - Si lo dejas vacío, el botón flotante no aparece.
+
+   3) EMAIL_CONTACTO  (opcional, canal alterno si falla el envío)
+      - Déjalo vacío si prefieres no publicar tu correo en el sitio.
+   ========================================================================== */
+const SITE_CONFIG = {
+    FORMSPREE_ID: 'PEGA-AQUI-TU-ID',
+    WHATSAPP: '584241237997',
+    EMAIL_CONTACTO: ''
+};
+
+
+/* ==========================================================================
    PARTICLE CANVAS SYSTEM (CIRCUIT BOARD PARTICLES)
    ========================================================================== */
 const canvas = document.getElementById('particleCanvas');
@@ -277,35 +305,51 @@ function animateSkillBars() {
    ========================================================================== */
 const filterButtons = document.querySelectorAll('.filter-btn');
 const projectCards = document.querySelectorAll('.project-card');
+const projectsEmptyState = document.getElementById('projectsEmptyState');
+
+function applyProjectFilter(filter) {
+    let visibleCount = 0;
+
+    projectCards.forEach(card => {
+        const category = card.getAttribute('data-category');
+
+        if (filter === 'all' || category === filter) {
+            visibleCount++;
+            card.style.display = 'block';
+            // Trigger smooth fade-in
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'scale(1)';
+            }, 50);
+        } else {
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.95)';
+            // Delay hiding element to let fade transition finish
+            setTimeout(() => {
+                card.style.display = 'none';
+            }, 300);
+        }
+    });
+
+    // Show an inviting empty state instead of a blank grid
+    if (projectsEmptyState) {
+        if (visibleCount === 0) {
+            setTimeout(() => { projectsEmptyState.hidden = false; }, 300);
+        } else {
+            projectsEmptyState.hidden = true;
+        }
+    }
+}
 
 filterButtons.forEach(button => {
     button.addEventListener('click', () => {
         const filter = button.getAttribute('data-filter');
-        
+
         // Update active class on buttons
         filterButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
 
-        // Filter projects
-        projectCards.forEach(card => {
-            const category = card.getAttribute('data-category');
-            
-            if (filter === 'all' || category === filter) {
-                card.style.display = 'block';
-                // Trigger smooth fade-in
-                setTimeout(() => {
-                    card.style.opacity = '1';
-                    card.style.transform = 'scale(1)';
-                }, 50);
-            } else {
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0.95)';
-                // Delay hiding element to let fade transition finish
-                setTimeout(() => {
-                    card.style.display = 'none';
-                }, 300);
-            }
-        });
+        applyProjectFilter(filter);
     });
 });
 
@@ -366,7 +410,9 @@ function highlightActiveLink() {
 
 
 /* ==========================================================================
-   CONTACT FORM - SECURE CONSOLE SIMULATION
+   CONTACT FORM - REAL SUBMISSION OVER SECURE CONSOLE UI
+   Los datos se envían de verdad al correo configurado en SITE_CONFIG.
+   La animación de terminal ahora refleja el estado REAL del envío.
    ========================================================================== */
 const contactForm = document.getElementById('contactForm');
 const statusLog = document.getElementById('statusLog');
@@ -383,54 +429,122 @@ cardButtons.forEach(btn => {
     });
 });
 
-contactForm.addEventListener('submit', (e) => {
+// Prints one line into the terminal log with the cyberpunk beep
+function printTerminalLine(text, tone = 'info') {
+    const colors = { info: 'var(--color-cyan)', ok: '#22c55e', error: '#ef4444' };
+    const line = document.createElement('span');
+    line.className = 'status-line';
+    line.style.display = 'block';
+    line.style.color = colors[tone] || colors.info;
+    line.innerHTML = text;
+    statusLog.appendChild(line);
+    statusLog.scrollTop = statusLog.scrollHeight;
+
+    const freq = tone === 'error' ? 220 : tone === 'ok' ? 700 : 450;
+    playSynthBeep(freq, 0.04, 'square');
+}
+
+// Small pause so the terminal still feels alive while the request travels
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+// Builds the fallback message shown if the network or the config fails
+function buildFallbackContact(name, projectLabel, message) {
+    const options = [];
+    if (SITE_CONFIG.WHATSAPP) {
+        const text = encodeURIComponent(
+            `Hola JPDevSlayer, soy ${name}. Me interesa: ${projectLabel}.\n\n${message}`
+        );
+        options.push(`<a href="https://wa.me/${SITE_CONFIG.WHATSAPP}?text=${text}" target="_blank" rel="noopener" class="status-fallback-link">ESCRIBIR POR WHATSAPP</a>`);
+    }
+    if (SITE_CONFIG.EMAIL_CONTACTO) {
+        const subject = encodeURIComponent(`Proyecto: ${projectLabel} - ${name}`);
+        const body = encodeURIComponent(message);
+        options.push(`<a href="mailto:${SITE_CONFIG.EMAIL_CONTACTO}?subject=${subject}&body=${body}" class="status-fallback-link">ENVIAR POR CORREO</a>`);
+    }
+    return options.length ? `>> CANAL ALTERNO DISPONIBLE: ${options.join(' &nbsp;/&nbsp; ')}` : '';
+}
+
+contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const message = document.getElementById('message').value;
-    
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const message = document.getElementById('message').value.trim();
+    const honeypot = document.getElementById('company_website');
+
+    // Human-readable label of the selected service
+    const projectLabel = projectSelect.selectedIndex > 0
+        ? projectSelect.options[projectSelect.selectedIndex].text
+        : 'No especificado';
+
     const submitBtn = contactForm.querySelector('.btn-submit');
     submitBtn.disabled = true;
-
-    // Terminal simulated console logs
-    const logs = [
-        `>> INICIANDO PROTOCOLO DE TRANSMISIÓN DE DATOS...`,
-        `>> CONECTANDO CON EL SERVIDOR JPDevSlayer SECURE SHELL...`,
-        `>> ENCRIPTANDO MENSAJE MEDIANTE AES-256 PARA [${name.toUpperCase()}]...`,
-        `>> ENVIANDO SEÑALES DE COMUNICACIÓN A: ${email.toLowerCase()}...`,
-        `>> TRANSFERENCIA DE DATOS COMPLETADA CON ÉXITO. MISIÓN REGISTRADA.`,
-        `>> CONEXIÓN CERRADA. ¡GRACIAS! NOS COMUNICAREMOS PRONTO.`
-    ];
-
     statusLog.innerHTML = '';
-    let logIndex = 0;
 
-    function printNextLog() {
-        if (logIndex < logs.length) {
-            const line = document.createElement('span');
-            line.className = 'status-line';
-            line.style.display = 'block';
-            line.style.color = logIndex === logs.length - 1 || logIndex === logs.length - 2 ? '#22c55e' : 'var(--color-cyan)';
-            line.textContent = logs[logIndex];
-            statusLog.appendChild(line);
-            
-            // Audio sound effect for terminal logging
-            playSynthBeep(400 + (logIndex * 100), 0.04, 'square');
+    printTerminalLine('>> INICIANDO PROTOCOLO DE TRANSMISIÓN DE DATOS...');
+    await wait(500);
 
-            logIndex++;
-            setTimeout(printNextLog, 800);
-        } else {
-            // Re-enable and reset form
-            submitBtn.disabled = false;
-            contactForm.reset();
-            setTimeout(() => {
-                statusLog.innerHTML = '<span class="status-line">>> Canal listo para nueva transmisión. Esperando operador...</span>';
-            }, 6000);
-        }
+    // Honeypot: only bots fill this hidden field. Fake success, send nothing.
+    if (honeypot && honeypot.value) {
+        printTerminalLine('>> TRANSFERENCIA COMPLETADA.', 'ok');
+        submitBtn.disabled = false;
+        contactForm.reset();
+        return;
     }
 
-    printNextLog();
+    printTerminalLine(`>> ENCRIPTANDO MENSAJE DE [${name.toUpperCase()}]...`);
+    await wait(450);
+    printTerminalLine('>> CONECTANDO CON EL SERVIDOR JPDevSlayer...');
+
+    try {
+        if (!SITE_CONFIG.FORMSPREE_ID || SITE_CONFIG.FORMSPREE_ID.includes('PEGA-AQUI')) {
+            throw new Error('SIN_CONFIGURAR');
+        }
+
+        const response = await fetch(`https://formspree.io/f/${SITE_CONFIG.FORMSPREE_ID}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                _subject: `Nuevo proyecto (${projectLabel}) - ${name}`,
+                name: name,
+                email: email,
+                tipo_de_proyecto: projectLabel,
+                message: message,
+                origen: 'jpdevslayer.com'
+            })
+        });
+
+        if (!response.ok) {
+            const result = await response.json().catch(() => ({}));
+            const detail = (result.errors || []).map(err => err.message).join(', ');
+            throw new Error(detail || `ERROR_${response.status}`);
+        }
+
+        printTerminalLine(`>> MENSAJE ENTREGADO. CANAL DE RESPUESTA: ${email.toLowerCase()}`, 'ok');
+        await wait(400);
+        printTerminalLine('>> MISIÓN REGISTRADA. TE RESPONDEREMOS EN MENOS DE 24 HORAS.', 'ok');
+
+        contactForm.reset();
+        setTimeout(() => {
+            statusLog.innerHTML = '<span class="status-line">>> Canal listo para nueva transmisión. Esperando operador...</span>';
+        }, 10000);
+
+    } catch (error) {
+        const reason = error.message === 'SIN_CONFIGURAR'
+            ? '>> ERROR: CANAL PRINCIPAL NO CONFIGURADO.'
+            : '>> ERROR: NO SE PUDO ESTABLECER LA CONEXIÓN.';
+
+        printTerminalLine(reason, 'error');
+        const fallback = buildFallbackContact(name, projectLabel, message);
+        if (fallback) {
+            printTerminalLine(fallback, 'error');
+        } else {
+            printTerminalLine('>> INTENTA DE NUEVO EN UNOS MINUTOS.', 'error');
+        }
+        console.error('[Formulario de contacto]', error);
+    } finally {
+        submitBtn.disabled = false;
+    }
 });
 
 /* ==========================================================================
@@ -516,90 +630,6 @@ const projectData = {
             { src: "assets/nexus_2.gif", caption: "Dashboard Global: Métricas en tiempo real y tarjetas de asistencia con alertas." },
             { src: "assets/nexus_3.gif", caption: "Configuración Avanzada: Mapeo de columnas, tolerancia de horarios y omisión de empleados." },
             { src: "assets/web_sphere.jpg", caption: "Diseño futurista basado en Glassmorphism." }
-        ]
-    },
-    vortex: {
-        title: "PROJECT VORTEX",
-        subtitle: "Videojuego de Naves Espaciales en 3D",
-        meta: "UNITY // DESARROLLO 3D // SHADERS",
-        stats: {
-            "Motor": "Unity 2025",
-            "Lenguaje": "C#",
-            "Render": "WebGL / Mobile URP",
-            "Estado": "Completado"
-        },
-        description: "Un videojuego arcade de naves espaciales en 3D de ritmo frenético. Cuenta con mecánicas de disparo dinámicas, generación procedimental de oleadas de enemigos y shaders de escudos cibernéticos optimizados para ejecutarse a 60fps constantes.",
-        features: [
-            "<strong>Shader Graph Personalizados:</strong> Escudos cibernéticos que reaccionan visualmente a los impactos de asteroides.",
-            "<strong>Control Optimizado:</strong> Soporte de mandos inalámbricos y controles táctiles giroscópicos móviles.",
-            "<strong>WebGL Output:</strong> Optimización de peso de build web para tiempos de carga inferiores a 5 segundos."
-        ],
-        tech: ["Unity Engine", "C# scripting", "Shader Graph", "URP Renderer", "WebGL", "Audio Mixers"],
-        images: [
-            { src: "assets/game_sphere.png", caption: "Render conceptual de la esfera cibernética de energía del juego." }
-        ]
-    },
-    dashboard: {
-        title: "NEON NEST DASHBOARD",
-        subtitle: "Visualizador WebGL de Métricas en Tiempo Real",
-        meta: "VANILLA JS // RENDIMIENTO // WEBGL",
-        stats: {
-            "Framework": "HTML5 / CSS3 Puro",
-            "Lenguaje": "JavaScript Vanilla",
-            "Rendimiento": "100/100 Lighthouse",
-            "Estado": "Producción"
-        },
-        description: "Un panel de control web inmersivo y responsivo para monitorización de datos. Implementa efectos avanzados de refracción de luz (glassmorphism) e interactividad con partículas en tiempo real sin librerías externas pesadas.",
-        features: [
-            "<strong>Spotlight Effects:</strong> Efecto de iluminación interactiva Bento Grid que sigue el movimiento del puntero.",
-            "<strong>Sound Synthesis:</strong> Generación de sonidos de interfaz mediante Web Audio API (sintetizador de frecuencias).",
-            "<strong>Lighthouse Optimization:</strong> Cero dependencias externas para lograr tiempos de carga instantáneos."
-        ],
-        tech: ["HTML5", "CSS Custom Variables", "Vanilla JavaScript", "Web Audio API", "HTML5 Canvas"],
-        images: [
-            { src: "assets/web_sphere.png", caption: "Ilustración de la esfera cibernética representando la interconexión web." }
-        ]
-    },
-    aegis: {
-        title: "AEGIS SHIELD UTILITY",
-        subtitle: "Software de Encriptación y Seguridad Local",
-        meta: "RUST // TAURI // MULTIPLATAFORMA",
-        stats: {
-            "Núcleo": "Rust (Seguridad de Memoria)",
-            "Frontend": "HTML/JS con Tauri",
-            "Peso Bundle": "&lt; 4 MB",
-            "Estado": "En Desarrollo"
-        },
-        description: "Una aplicación de escritorio ultraligera y segura para encriptar archivos y bases de datos locales mediante algoritmos criptográficos robustos, asegurando total privacidad de la información.",
-        features: [
-            "<strong>Multiplataforma:</strong> Compilado nativo para Windows y Linux usando Tauri.",
-            "<strong>Criptografía AES-GCM:</strong> Encriptación simétrica segura implementada directamente en Rust.",
-            "<strong>Consumo de RAM Mínimo:</strong> Consumo inferior a 15MB de memoria RAM en segundo plano."
-        ],
-        tech: ["Rust", "Tauri Framework", "PostgreSQL", "Criptografía AES", "Desktop Native API"],
-        images: [
-            { src: "assets/app_sphere.png", caption: "Render conceptual que ilustra la encriptación local y blindaje Aegis." }
-        ]
-    },
-    chrono: {
-        title: "CHRONO SLAYER",
-        subtitle: "Mecánicas de Manipulación de Tiempo",
-        meta: "UNREAL ENGINE 5 // C++ // NIAGARA FX",
-        stats: {
-            "Motor": "Unreal Engine 5",
-            "Lenguaje": "C++ Nativo",
-            "FX System": "Niagara Particles",
-            "Estado": "Etapa Alpha"
-        },
-        description: "Una demo técnica jugable en Unreal Engine 5 inspirada en mecánicas de manipulación del tiempo. Escrita principalmente en C++ para garantizar la máxima velocidad de procesamiento físico.",
-        features: [
-            "<strong>Time Dilated Physics:</strong> Control de tiempo individual para objetos del mundo y enemigos.",
-            "<strong>Niagara Visual FX:</strong> Efectos de distorsión espacio-temporal de alta fidelidad.",
-            "<strong>Optimización C++:</strong> Estructura de código nativa con mínima dependencia en Blueprints."
-        ],
-        tech: ["Unreal Engine 5", "C++", "Niagara FX", "Chaos Physics", "Materials & HLSL"],
-        images: [
-            { src: "assets/game_sphere.png", caption: "Esfera de energía temporal usada en el render de Chrono Slayer." }
         ]
     }
 };
@@ -790,9 +820,29 @@ function initProjectModal() {
     });
 }
 
+
+/* ==========================================================================
+   FLOATING WHATSAPP CHANNEL
+   Solo aparece si cargaste un número en SITE_CONFIG.WHATSAPP
+   ========================================================================== */
+function initWhatsappFab() {
+    const fab = document.getElementById('whatsappFab');
+    if (!fab) return;
+
+    const numero = (SITE_CONFIG.WHATSAPP || '').replace(/\D/g, '');
+    if (!numero) return;
+
+    const saludo = encodeURIComponent(
+        'Hola JPDevSlayer, vi tu portafolio y me interesa que desarrolles un proyecto.'
+    );
+    fab.href = `https://wa.me/${numero}?text=${saludo}`;
+    fab.hidden = false;
+}
+
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
     attachSoundEffects();
     highlightActiveLink();
     initProjectModal();
+    initWhatsappFab();
 });

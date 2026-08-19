@@ -869,6 +869,7 @@ h1, h2, h3, h4, h5, h6 {
    ========================================================================== */
 .portfolio-filters {
     display: flex;
+    flex-wrap: wrap; /* Evita que los 4 filtros desborden en móvil */
     justify-content: center;
     gap: 1rem;
     margin-bottom: 4rem;
@@ -1447,6 +1448,14 @@ h1, h2, h3, h4, h5, h6 {
         text-align: center;
         gap: 2rem;
         padding-top: 2rem;
+    }
+
+    /* En columna, el bloque de texto tomaba su ancho max-content (480px) y se
+       recortaba en pantallas angostas. Lo forzamos al ancho del contenedor. */
+    .hero-text-content {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
     }
     
     .hero-logo-box {
@@ -2187,3 +2196,178 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
+
+
+/* ==========================================================================
+   HONEYPOT ANTI-SPAM FIELD
+   Debe ser invisible pero NO con display:none (algunos bots lo detectan)
+   ========================================================================== */
+.hp-field {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+/* ==========================================================================
+   CONTACT TERMINAL - FALLBACK LINKS (canal alterno si falla el envío)
+   ========================================================================== */
+.status-fallback-link {
+    color: var(--color-cyan);
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(0, 240, 255, 0.5);
+    transition: var(--transition-fast);
+    white-space: nowrap;
+}
+
+.status-fallback-link:hover {
+    color: #fff;
+    text-shadow: var(--neon-text-glow);
+    border-bottom-color: var(--color-cyan);
+}
+
+
+/* ==========================================================================
+   PROJECTS - EMPTY STATE (categoría sin casos públicos todavía)
+   ========================================================================== */
+.projects-empty-state {
+    grid-column: 1 / -1;
+    max-width: 620px;
+    margin: 1rem auto 0;
+    padding: 3.5rem 2rem;
+    text-align: center;
+    background: rgba(10, 12, 16, 0.55);
+    border: 1px dashed var(--color-border);
+    border-radius: 14px;
+    backdrop-filter: blur(6px);
+    animation: emptyStateFade 0.45s ease both;
+}
+
+.projects-empty-state[hidden] {
+    display: none;
+}
+
+@keyframes emptyStateFade {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.empty-state-icon {
+    color: var(--color-cyan);
+    opacity: 0.55;
+    margin-bottom: 1.25rem;
+}
+
+.empty-state-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    color: var(--color-text-primary);
+    margin-bottom: 0.85rem;
+}
+
+.empty-state-text {
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    margin-bottom: 1.75rem;
+}
+
+
+/* ==========================================================================
+   FLOATING WHATSAPP CHANNEL
+   ========================================================================== */
+.whatsapp-fab {
+    position: fixed;
+    bottom: 5.75rem;
+    right: 2rem;
+    z-index: 1000;
+    height: 52px;
+    min-width: 52px;
+    padding: 0 14px;
+    border-radius: 26px;
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    text-decoration: none;
+    box-shadow: 0 6px 22px rgba(37, 211, 102, 0.35);
+    transition: var(--transition-smooth);
+    overflow: hidden;
+}
+
+.whatsapp-fab[hidden] {
+    display: none;
+}
+
+.whatsapp-fab svg {
+    flex-shrink: 0;
+}
+
+.whatsapp-fab-label {
+    font-family: var(--font-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    max-width: 0;
+    opacity: 0;
+    transition: var(--transition-smooth);
+}
+
+.whatsapp-fab:hover {
+    box-shadow: 0 8px 30px rgba(37, 211, 102, 0.55);
+    transform: translateY(-2px);
+}
+
+.whatsapp-fab:hover .whatsapp-fab-label {
+    max-width: 220px;
+    opacity: 1;
+    margin-left: 10px;
+}
+
+/* Pulso sutil para atraer la mirada sin ser molesto */
+.whatsapp-fab::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 26px;
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.45);
+    animation: whatsappPulse 2.8s infinite;
+    pointer-events: none;
+}
+
+@keyframes whatsappPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.45); }
+    70%  { box-shadow: 0 0 0 14px rgba(37, 211, 102, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+}
+
+@media (max-width: 768px) {
+    .whatsapp-fab {
+        bottom: 5rem;
+        right: 1.25rem;
+        height: 48px;
+        min-width: 48px;
+        padding: 0 12px;
+    }
+
+    /* En móvil no hay hover: la etiqueta se mantiene oculta */
+    .whatsapp-fab-label {
+        display: none;
+    }
+
+    .projects-empty-state {
+        padding: 2.5rem 1.25rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .whatsapp-fab::after {
+        animation: none;
+    }
+}
