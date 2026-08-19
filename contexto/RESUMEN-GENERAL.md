@@ -119,7 +119,7 @@ Ese día se corrigió el fallo más grave del proyecto: **el formulario de conta
 
 También se eliminaron 4 proyectos que no tenían capturas reales (VORTEX, NEON NEST, AEGIS, CHRONO): mostraban una esfera decorativa genérica en lugar del trabajo. Frente a un cliente eso resta más de lo que suma. Quedan los 3 casos reales.
 
-**Al 2026-08-19 los cambios están en la carpeta local, sin subir.** La web sigue mostrando la versión vieja.
+**Desplegado el 2026-08-19** en el commit `c85eba1`. Verificado en `https://jpdevslayer.com` ya en producción: 3 proyectos, botón de WhatsApp activo, formulario degradando a WhatsApp, y sin desbordamiento horizontal a 375 px.
 
 ---
 
@@ -151,4 +151,5 @@ También se eliminaron 4 proyectos que no tenían capturas reales (VORTEX, NEON 
 
 | Fecha | Cambio |
 |---|---|
+| 2026-08-19 | Desplegado a producción (`c85eba1`) y verificado en el dominio real. |
 | 2026-08-19 | Auditoría completa del proyecto. Formulario de contacto convertido de simulación a envío real por Formspree, con honeypot y canal alterno de WhatsApp. Botón flotante de WhatsApp (`+58 424-1237997`). Eliminados los 4 proyectos sin capturas reales. Añadido estado vacío para filtros sin resultados. Corregido desbordamiento horizontal en móvil que venía de producción. Creada la carpeta `contexto/`. |

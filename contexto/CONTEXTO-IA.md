@@ -202,9 +202,11 @@ Si falta la mitad de `script.js`, la tarjeta no abre el modal. Si falta la de `i
 
 `SITE_CONFIG.FORMSPREE_ID` sigue en `PEGA-AQUI-TU-ID`. **La cuenta de Formspree la crea el usuario**; un agente no debe crear cuentas en su nombre. Mientras tanto el formulario degrada al canal de WhatsApp, que sí está configurado.
 
-### No desplegado
+### Desplegado
 
-Al cierre del 2026-08-19 los cambios están **solo en la carpeta local**. `git status` muestra modificados `index.html`, `script.js`, `styles.css`, y sin seguimiento `contexto/` y `.claude/`. La web pública sigue sirviendo la versión anterior, con los 7 proyectos y el formulario simulado.
+Commit `c85eba1`, subido a `main` el 2026-08-19. `git rev-list --left-right --count origin/main...main` devuelve `0	0` y el árbol de trabajo está limpio.
+
+Verificado **en el dominio real**, no en local: 3 proyectos, `SITE_CONFIG.WHATSAPP` cargado, botón flotante activo, estado vacío funcionando al filtrar por `games`, `scrollWidth === clientWidth === 375`, y el formulario degradando correctamente a WhatsApp por falta de `FORMSPREE_ID`.
 
 ---
 
@@ -240,4 +242,4 @@ Al retomar el proyecto, en este orden:
 
 | Fecha | Cambio |
 |---|---|
-| 2026-08-19 | Creación del documento y de la carpeta `contexto/`, replicando la estructura de 3 archivos usada en `sigmamath`. Auditoría completa del proyecto. **Hallazgo principal:** el formulario de contacto era una simulación que mostraba "TRANSFERENCIA DE DATOS COMPLETADA CON ÉXITO" sin enviar nada, y los mensajes de clientes se perdían en silencio. Migrado a POST real contra Formspree, con honeypot `_gotcha`, estados verdaderos en la terminal y degradación a WhatsApp si falla. Añadido botón flotante de WhatsApp con el número `+58 424-1237997`. Eliminados 4 proyectos sin capturas reales (`vortex`, `dashboard`, `aegis`, `chrono`) que mostraban una esfera decorativa genérica como si fuera el trabajo entregado; quedaron los 3 casos verificables. Añadido `#projectsEmptyState` para los filtros sin resultados. Corregido un desbordamiento horizontal en móvil **preexistente en producción**. Descartado Web3Forms por CORS. Todo verificado en navegador a 375 px y 1274 px. **Nada subido al repositorio todavía.** |
+| 2026-08-19 | Creación del documento y de la carpeta `contexto/`, replicando la estructura de 3 archivos usada en `sigmamath`. Auditoría completa del proyecto. **Hallazgo principal:** el formulario de contacto era una simulación que mostraba "TRANSFERENCIA DE DATOS COMPLETADA CON ÉXITO" sin enviar nada, y los mensajes de clientes se perdían en silencio. Migrado a POST real contra Formspree, con honeypot `_gotcha`, estados verdaderos en la terminal y degradación a WhatsApp si falla. Añadido botón flotante de WhatsApp con el número `+58 424-1237997`. Eliminados 4 proyectos sin capturas reales (`vortex`, `dashboard`, `aegis`, `chrono`) que mostraban una esfera decorativa genérica como si fuera el trabajo entregado; quedaron los 3 casos verificables. Añadido `#projectsEmptyState` para los filtros sin resultados. Corregido un desbordamiento horizontal en móvil **preexistente en producción**. Descartado Web3Forms por CORS. Todo verificado en navegador a 375 px y 1274 px. Desplegado en el commit `c85eba1` y verificado de nuevo ya en `https://jpdevslayer.com`. |
