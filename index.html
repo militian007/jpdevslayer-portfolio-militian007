@@ -3,541 +3,728 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="JPDevSlayer - Portafolio profesional de desarrollo. Creación de videojuegos inmersivos, páginas web ultra-modernas, aplicaciones y programas de alto rendimiento.">
-    <meta name="keywords" content="JPDevSlayer, videojuegos, páginas web, desarrollo web, aplicaciones, programador, tauri, unity, react, portafolio futurista">
+    <title>JPDevSlayer — Desarrollo de software a medida</title>
+    <meta name="description" content="Diseño y programo sistemas de gestión, aplicaciones y sitios web a medida. Código propio, sin plantillas, entregado en producción.">
     <meta name="author" content="JPDevSlayer">
-    
-    <!-- Open Graph / Facebook -->
+    <link rel="canonical" href="https://www.jpdevslayer.com/">
+
+    <!-- Favicon -->
+    <link rel="icon" href="assets/logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/logo.png">
+
+    <!-- Vista previa al compartir. URL absoluta: con ruta relativa se rompe. -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="JPDevSlayer | Portafolio de Desarrollo y Videojuegos">
-    <meta property="og:description" content="Forja tu imperio digital. Desarrollo de videojuegos, páginas web, programas y aplicaciones de alto rendimiento.">
-    <meta property="og:image" content="assets/logo.jpg">
+    <meta property="og:url" content="https://www.jpdevslayer.com/">
+    <meta property="og:title" content="JPDevSlayer — Desarrollo de software a medida">
+    <meta property="og:description" content="Sistemas de gestión, aplicaciones y sitios web a medida. Código propio, sin plantillas, entregado en producción.">
+    <meta property="og:image" content="https://www.jpdevslayer.com/assets/logo.png">
+    <meta property="og:locale" content="es_ES">
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="JPDevSlayer | Portafolio de Desarrollo y Videojuegos">
-    <meta property="twitter:description" content="Forja tu imperio digital. Desarrollo de videojuegos, páginas web, programas y aplicaciones de alto rendimiento.">
-    <meta property="twitter:image" content="assets/logo.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="JPDevSlayer — Desarrollo de software a medida">
+    <meta name="twitter:description" content="Sistemas de gestión, aplicaciones y sitios web a medida. Código propio, sin plantillas.">
+    <meta name="twitter:image" content="https://www.jpdevslayer.com/assets/logo.png">
 
-    <title>JPDevSlayer | Portafolio de Desarrollo y Videojuegos</title>
+    <meta name="theme-color" content="#0A0E14">
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Orbitron:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Stylesheet -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Scanline overlay to simulate CRT screen (Cyberpunk feel) -->
-    <div class="crt-overlay"></div>
+    <div class="grain" aria-hidden="true"></div>
 
-    <!-- Custom sound control floating button -->
-    <button class="sound-toggle-btn" id="soundToggle" aria-label="Activar Sonido" title="Activar/Desactivar efectos de sonido">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sound-off-icon"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><line x1="22" y1="9" x2="16" y2="15"></line><line x1="16" y1="9" x2="22" y2="15"></line></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sound-on-icon d-none"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
-    </button>
+    <!-- ==================================================================
+         NAVEGACIÓN
+         ================================================================== -->
+    <header class="nav" id="nav">
+        <div class="shell nav-inner">
+            <a href="#top" class="brand" aria-label="JPDevSlayer, inicio">
+                <span class="brand-slot" id="brandSlot" aria-hidden="true"></span>
+                <span>JPDevSlayer</span>
+            </a>
 
-    <!-- Floating WhatsApp channel. Se muestra solo si SITE_CONFIG.WHATSAPP tiene número -->
-    <a href="#" class="whatsapp-fab" id="whatsappFab" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884a9.82 9.82 0 016.988 2.898 9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.548 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-        <span class="whatsapp-fab-label">Hablemos de tu proyecto</span>
-    </a>
-
-    <!-- Navigation Header -->
-    <header class="navbar" id="navbar">
-        <div class="nav-container">
-            <!-- Left links (hidden on mobile, flex on desktop) -->
-            <div class="nav-left">
-                <a href="#hero" class="nav-link active">INICIO</a>
-                <span class="nav-divider">|</span>
-                <a href="#services" class="nav-link">SERVICIOS</a>
-                <span class="nav-divider">|</span>
-                <a href="#projects" class="nav-link">PROYECTOS</a>
-                <span class="nav-divider">|</span>
-                <a href="#skills" class="nav-link">HABILIDADES</a>
-            </div>
-
-            <!-- Center hanging shield with user logo -->
-            <div class="nav-center">
-                <a href="#hero" class="nav-logo-shield" aria-label="Volver al inicio">
-                    <img src="assets/logo.png" alt="JPDevSlayer Logo" class="shield-logo">
-                </a>
-            </div>
-
-            <!-- Right button (hidden on mobile, flex on desktop) -->
-            <div class="nav-right">
-                <a href="#contact" class="nav-pill-btn">INICIAR PROYECTO</a>
-            </div>
-
-            <!-- Mobile Toggle -->
-            <button class="mobile-toggle" id="mobileToggle" aria-label="Abrir Menú">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-
-            <!-- Mobile Menu Dropdown -->
-            <nav class="nav-menu" id="navMenu">
-                <a href="#hero" class="nav-link active">INICIO</a>
-                <a href="#services" class="nav-link">SERVICIOS</a>
-                <a href="#projects" class="nav-link">PROYECTOS</a>
-                <a href="#skills" class="nav-link">HABILIDADES</a>
-                <a href="#contact" class="nav-link nav-btn">INICIAR PROYECTO</a>
+            <nav class="nav-links" id="navLinks" aria-label="Principal">
+                <a href="#servicios">Servicios</a>
+                <a href="#trabajos">Trabajos</a>
+                <a href="#stack">Stack</a>
+                <a href="#proceso">Proceso</a>
+                <a href="#precios">Precios</a>
             </nav>
+
+            <div class="nav-side">
+                <a href="#contacto" class="btn btn-solid btn-sm">Hablemos</a>
+                <button class="burger" id="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="drawer">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- Hero Section with Animated Canvas Background -->
-    <section id="hero" class="hero-section">
-        <canvas id="particleCanvas" class="hero-canvas"></canvas>
-        <div class="hero-container">
-            <div class="hero-logo-box animate-pulse">
-                <img src="assets/logo.png" alt="Logo de JPDevSlayer" class="hero-logo">
-                <div class="hero-logo-glow"></div>
+    <div class="drawer" id="drawer">
+        <a href="#servicios">Servicios</a>
+        <a href="#trabajos">Trabajos</a>
+        <a href="#stack">Stack</a>
+        <a href="#proceso">Proceso</a>
+        <a href="#precios">Precios</a>
+        <a href="#contacto">Contacto</a>
+    </div>
+
+    <!-- ==================================================================
+         HERO — el logo es el protagonista y viaja hasta la barra al bajar
+         ================================================================== -->
+    <section class="hero" id="top">
+        <div class="hero-aura" aria-hidden="true"></div>
+        <canvas class="hero-stars" id="stars" aria-hidden="true"></canvas>
+
+        <!-- El sello vive aquí, pero su posición la maneja el scroll -->
+        <div class="sigil" id="sigil" aria-hidden="true">
+            <div class="sigil-ring"></div>
+            <div class="sigil-ring sigil-ring-2"></div>
+            <img src="assets/logo.png" alt="" class="sigil-img">
+        </div>
+
+        <div class="shell hero-inner">
+            <p class="tag hero-eyebrow">Desarrollo de software a medida</p>
+
+            <h1 class="hero-title" id="heroTitle">
+                <span class="line-mask"><span>Software hecho</span></span>
+                <span class="line-mask"><span style="--d: 90ms">a la medida de</span></span>
+                <span class="line-mask"><span style="--d: 180ms"><em>negocios reales.</em></span></span>
+            </h1>
+
+            <p class="hero-sub rise" style="--d: 380ms">Sistemas de gestión, aplicaciones y sitios web. Diseño, programo y entrego el producto completo: desde la base de datos hasta la última pantalla, con el código fuente en tus manos.</p>
+
+            <div class="hero-actions rise" style="--d: 460ms">
+                <a href="#trabajos" class="btn btn-solid magnet">Ver trabajos</a>
+                <a href="#contacto" class="btn btn-line magnet">Cotizar un proyecto</a>
             </div>
-            
-            <div class="hero-text-content">
-                <h2 class="hero-tagline">FORGE YOUR DIGITAL EMPIRE</h2>
-                <h1 class="hero-title">JPDevSlayer</h1>
-                <p class="hero-subtitle">INNOVATIVE SOLUTIONS FOR TOMORROW</p>
-                <div class="hero-separator">
-                    <span class="line"></span>
-                    <span class="slash"></span>
-                    <span class="line"></span>
+
+            <div class="hero-foot rise" style="--d: 560ms">
+                <div>
+                    <span class="fact-n" data-count="4">4</span>
+                    <span class="fact-l">Sistemas construidos</span>
                 </div>
-                <p class="hero-description">Desarrollo de primer nivel de videojuegos inmersivos, páginas web de última generación, aplicaciones inteligentes y programas de alto rendimiento.</p>
-                
-                <div class="hero-cta-buttons">
-                    <a href="#services" class="btn btn-primary">EXPLORAR ARSENAL</a>
-                    <a href="#contact" class="btn btn-outline">ESTABLECER CONEXIÓN</a>
+                <div>
+                    <span class="fact-n">0</span>
+                    <span class="fact-l">Plantillas compradas</span>
+                </div>
+                <div>
+                    <span class="fact-n">100%</span>
+                    <span class="fact-l">Código fuente entregado</span>
                 </div>
             </div>
         </div>
-        <div class="hero-scroll-indicator">
-            <span>SCROLL DOWN</span>
-            <div class="mouse-icon">
-                <span class="wheel"></span>
-            </div>
-        </div>
-    </section>
 
-    <!-- Services Section (Bento Glassmorphic Layout) -->
-    <section id="services" class="services-section section-padding">
-        <div class="container">
-            <div class="section-header text-center">
-                <div class="section-badge">MODULOS DE DESARROLLO</div>
-                <h2 class="section-title">SERVICIOS DE INGENIERÍA</h2>
-                <div class="title-underline"></div>
-            </div>
-
-            <div class="services-grid">
-                <!-- Card 1: Web Pages -->
-                <div class="service-card animate-scroll">
-                    <div class="card-glow"></div>
-                    <div class="card-image-wrapper">
-                        <img src="assets/web_sphere.jpg" alt="Esfera 3D Web" class="service-sphere-img">
-                    </div>
-                    <div class="card-content">
-                        <span class="service-subtitle">WEB ARCHITECTURE</span>
-                        <h3 class="service-title">PÁGINAS WEB ULTRA-MODERNAS</h3>
-                        <p class="service-description">Sitios web inmersivos y cinematográficos construidos bajo estándares actuales de diseño y rendimiento de 2026. Interfaces fluidas que se adaptan a cualquier dispositivo.</p>
-                    </div>
-                    <div class="card-footer">
-                        <a href="#contact" class="btn btn-service-pill" data-service="Páginas Web">CONSTRUIR LA WEB</a>
-                    </div>
-                </div>
-
-                <!-- Card 2: Games -->
-                <div class="service-card featured animate-scroll">
-                    <div class="card-glow"></div>
-                    <div class="card-image-wrapper">
-                        <img src="assets/game_sphere.jpg" alt="Esfera 3D Videojuegos" class="service-sphere-img">
-                    </div>
-                    <div class="card-content">
-                        <span class="service-subtitle">GAME DEVELOPMENT</span>
-                        <h3 class="service-title">VIDEOJUEGOS INMERSIVOS</h3>
-                        <p class="service-description">Creación de mundos virtuales y experiencias interactivas en motores líderes como Unity y Unreal Engine. Optimización para PC, consolas, móviles y WebGL.</p>
-                    </div>
-                    <div class="card-footer">
-                        <a href="#contact" class="btn btn-service-pill" data-service="Videojuegos">CREAR MUNDOS</a>
-                    </div>
-                </div>
-
-                <!-- Card 3: Apps & Programs -->
-                <div class="service-card animate-scroll">
-                    <div class="card-glow"></div>
-                    <div class="card-image-wrapper">
-                        <img src="assets/app_sphere.jpg" alt="Esfera 3D Aplicaciones" class="service-sphere-img">
-                    </div>
-                    <div class="card-content">
-                        <span class="service-subtitle">APPLICATION ENGINEERING</span>
-                        <h3 class="service-title">APLICACIONES Y PROGRAMAS</h3>
-                        <p class="service-description">Desarrollo de software de escritorio robusto y aplicaciones móviles eficientes. Soluciones a medida con arquitecturas escalables y alto rendimiento.</p>
-                    </div>
-                    <div class="card-footer">
-                        <a href="#contact" class="btn btn-service-pill" data-service="Programas y Aplicaciones">DESPLEGAR SOFTWARE</a>
-                    </div>
-                </div>
-            </div>
+        <div class="hero-cue" aria-hidden="true">
+            <span>Baja</span>
+            <i></i>
         </div>
     </section>
 
-    <!-- Projects Portfolio Section -->
-    <section id="projects" class="projects-section section-padding">
-        <div class="container">
-            <div class="section-header text-center">
-                <div class="section-badge">REGISTRO DE COMBATE</div>
-                <h2 class="section-title">PROYECTOS EJECUTADOS</h2>
-                <div class="title-underline"></div>
-            </div>
-
-            <!-- Filters -->
-            <div class="portfolio-filters">
-                <button class="filter-btn active" data-filter="all">TODOS</button>
-                <button class="filter-btn" data-filter="web">WEB</button>
-                <button class="filter-btn" data-filter="games">VIDEOJUEGOS</button>
-                <button class="filter-btn" data-filter="apps">APPS & PROGRAMAS</button>
-            </div>
-
-            <!-- Projects Grid -->
-            <div class="projects-grid" id="projectsGrid">
-                <div class="project-card animate-scroll featured-project" data-category="web" data-project-id="sigma">
-                    <div class="project-image-box">
-                        <div class="project-overlay">
-                            <span class="project-tech">HTML5 // CSS3 // JS // SUPABASE</span>
-                        </div>
-                        <div class="project-mock-img sigma-bg">
-                            <img src="assets/math_3.png" alt="Sigma Math Dashboard" class="project-card-screenshot">
-                            <div class="sigma-overlay-logo">
-                                <span class="sigma-logo-card">Σ</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <span class="project-meta text-cyan-glow">CLIENTE REAL // COMPLETADO & PAGADO</span>
-                        <h3 class="project-title">SIGMA MATH PORTAL</h3>
-                        <p class="project-desc">Portal académico y administrativo diseñado para una profesora de matemáticas. Permite control de notas, asistencia diaria y registro de pagos mensuales de estudiantes.</p>
-                        <div class="project-stats">
-                            <span>BASE DE DATOS: Supabase</span>
-                            <span>STATUS: PRODUCCIÓN (PAGADO)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project: BODEGA-3 Sistema Administrativo -->
-                <div class="project-card animate-scroll featured-project" data-category="web" data-project-id="bodega3">
-                    <div class="project-image-box">
-                        <div class="project-overlay">
-                            <span class="project-tech">REACT // VITE // TYPESCRIPT // TAILWIND // SUPABASE</span>
-                        </div>
-                        <div class="project-mock-img sigma-bg">
-                            <img src="assets/bodega_1.png" alt="Bodega 3 Dashboard" class="project-card-screenshot">
-                            <div class="sigma-overlay-logo">
-                                <span class="sigma-logo-card">B3</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <span class="project-meta text-cyan-glow">CLIENTE REAL // EN PRODUCCIÓN</span>
-                        <h3 class="project-title">BODEGA-3 SISTEMA ADMINISTRATIVO</h3>
-                        <p class="project-desc">Aplicación web full-stack para una bodega en Venezuela: gestión de inventario con 478 productos, ventas, compras, cuentas por cobrar/pagar, tasa BCV en tiempo real, dashboard analítico e importación masiva de ventas desde Excel. Multi-usuario con roles (admin/empleado) y Row Level Security.</p>
-                        <div class="project-stats">
-                            <span>BASE DE DATOS: Supabase (Postgres + RLS)</span>
-                            <span>STATUS: PRODUCCIÓN</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project: NEXUS Motor Analítico -->
-                <div class="project-card animate-scroll featured-project" data-category="web" data-project-id="nexus">
-                    <div class="project-image-box">
-                        <div class="project-overlay">
-                            <span class="project-tech">REACT // VITE // TAILWIND // CSS</span>
-                        </div>
-                        <div class="project-mock-img web-bg">
-                            <div class="web-globe-icon" style="font-size: 3rem;">⚡</div>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <span class="project-meta text-cyan-glow">CLIENTE REAL // SISTEMA PRIVADO</span>
-                        <h3 class="project-title">NEXUS MOTOR ANALÍTICO</h3>
-                        <p class="project-desc">Sistema de asistencia inteligente para procesar y analizar reportes biométricos generados por Hik-Connect. Interfaz futurista, agrupamiento de marcas de tiempo y alertas tempranas.</p>
-                        <div class="project-stats">
-                            <span>BASE DE DATOS: LocalStorage</span>
-                            <span>STATUS: PRODUCCIÓN</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Empty state shown when a filter category has no public cases yet -->
-            <div class="projects-empty-state" id="projectsEmptyState" hidden>
-                <div class="empty-state-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>
-                </div>
-                <h3 class="empty-state-title">EXPEDIENTE EN CLASIFICACIÓN</h3>
-                <p class="empty-state-text">Todavía no hay casos públicos en este módulo. Los proyectos de esta categoría están bajo acuerdo de confidencialidad o en desarrollo activo.</p>
-                <a href="#contact" class="btn btn-primary">SÉ EL PRIMER CASO DE ESTE MÓDULO</a>
-            </div>
+    <!-- ==================================================================
+         MARQUESINA DE TECNOLOGÍAS
+         ================================================================== -->
+    <div class="strip" aria-hidden="true">
+        <div class="strip-track" id="stripTrack">
+            <span class="strip-item">React</span>
+            <span class="strip-item">TypeScript</span>
+            <span class="strip-item">PostgreSQL</span>
+            <span class="strip-item">Supabase</span>
+            <span class="strip-item">Node.js</span>
+            <span class="strip-item">Python</span>
+            <span class="strip-item">Tailwind CSS</span>
+            <span class="strip-item">Vite</span>
+            <span class="strip-item">Row Level Security</span>
+            <span class="strip-item">Vercel</span>
+            <span class="strip-item">Git</span>
         </div>
-    </section>
+    </div>
 
-    <!-- Skills Section (Interactive Core) -->
-    <section id="skills" class="skills-section section-padding">
-        <div class="container">
-            <div class="section-header text-center">
-                <div class="section-badge">MATRIZ DE CAPACIDADES</div>
-                <h2 class="section-title">HABILIDADES DE INGENIERÍA</h2>
-                <div class="title-underline"></div>
-            </div>
+    <!-- ==================================================================
+         REEL — seccion anclada. El scroll no hace aparecer cosas:
+         el scroll ES el que mueve la secuencia, fotograma a fotograma.
+         ================================================================== -->
+    <section class="reel" id="reel" aria-label="Proyectos construidos">
+        <div class="reel-track" id="reelTrack">
+            <div class="reel-stage">
 
-            <div class="skills-container">
-                <!-- Skill core representing the engine -->
-                <div class="skills-core-wrapper">
-                    <div class="skills-core">
-                        <img src="assets/logo.png" alt="Logo JPDevSlayer" class="skills-core-logo animate-pulse">
-                        <div class="skills-core-orbit"></div>
-                        <div class="skills-core-status">SLAYER CORE ACTIVE</div>
-                    </div>
+                <div class="reel-bg" aria-hidden="true"></div>
+
+                <!-- Contador -->
+                <div class="reel-count" aria-hidden="true">
+                    <span id="reelNum">01</span><i></i><span class="reel-total">04</span>
                 </div>
 
-                <!-- Skill categories Grid -->
-                <div class="skills-categories">
-                    <!-- Frontend Skills -->
-                    <div class="skills-category-card">
-                        <h3 class="category-title">DESARROLLO FRONTEND</h3>
-                        <div class="skills-list">
-                            <div class="skill-item">
-                                <div class="skill-info">
-                                    <span class="skill-name">JavaScript</span>
-                                    <span class="skill-percentage">95%</span>
-                                </div>
-                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 95%"></div></div>
-                            </div>
-                            <div class="skill-item">
-                                <div class="skill-info">
-                                    <span class="skill-name">React.js</span>
-                                    <span class="skill-percentage">90%</span>
-                                </div>
-                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 90%"></div></div>
-                            </div>
-                            <div class="skill-item">
-                                <div class="skill-info">
-                                    <span class="skill-name">HTML5</span>
-                                    <span class="skill-percentage">95%</span>
-                                </div>
-                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 95%"></div></div>
-                            </div>
-                            <div class="skill-item">
-                                <div class="skill-info">
-                                    <span class="skill-name">CSS3</span>
-                                    <span class="skill-percentage">90%</span>
-                                </div>
-                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 90%"></div></div>
-                            </div>
-                            <div class="skill-item">
-                                <div class="skill-info">
-                                    <span class="skill-name">Bootstrap</span>
-                                    <span class="skill-percentage">85%</span>
-                                </div>
-                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 85%"></div></div>
-                            </div>
-                            <div class="skill-item">
-                                <div class="skill-info">
-                                    <span class="skill-name">Jest (Testing)</span>
-                                    <span class="skill-percentage">80%</span>
-                                </div>
-                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 80%"></div></div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Barra de avance -->
+                <div class="reel-bar" aria-hidden="true"><i id="reelBar"></i></div>
 
-                    <!-- Backend & Tools Skills -->
-                    <div class="skills-category-card">
-                        <h3 class="category-title">BACKEND & INFRAESTRUCTURA</h3>
-                        <div class="skills-list">
-                            <div class="skill-item">
-                                <div class="skill-info">
-                                    <span class="skill-name">Python</span>
-                                    <span class="skill-percentage">90%</span>
-                                </div>
-                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 90%"></div></div>
-                            </div>
-                            <div class="skill-item">
-                                <div class="skill-info">
-                                    <span class="skill-name">Flask</span>
-                                    <span class="skill-percentage">85%</span>
-                                </div>
-                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 85%"></div></div>
-                            </div>
-                            <div class="skill-item">
-                                <div class="skill-info">
-                                    <span class="skill-name">Restful APIs</span>
-                                    <span class="skill-percentage">90%</span>
-                                </div>
-                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 90%"></div></div>
-                            </div>
-                            <div class="skill-item">
-                                <div class="skill-info">
-                                    <span class="skill-name">SQL (Bases de Datos)</span>
-                                    <span class="skill-percentage">85%</span>
-                                </div>
-                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 85%"></div></div>
-                            </div>
-                            <div class="skill-item">
-                                <div class="skill-info">
-                                    <span class="skill-name">SQLAlchemy</span>
-                                    <span class="skill-percentage">80%</span>
-                                </div>
-                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 80%"></div></div>
-                            </div>
-                            <div class="skill-item">
-                                <div class="skill-info">
-                                    <span class="skill-name">JSON Web Token (JWT)</span>
-                                    <span class="skill-percentage">85%</span>
-                                </div>
-                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 85%"></div></div>
-                            </div>
-                            <div class="skill-item">
-                                <div class="skill-info">
-                                    <span class="skill-name">GitHub / Git</span>
-                                    <span class="skill-percentage">90%</span>
-                                </div>
-                                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 90%"></div></div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Titulo gigante que entra por cada proyecto -->
+                <div class="reel-word" aria-hidden="true">
+                    <span class="reel-word-item" data-i="0">Olimpo</span>
+                    <span class="reel-word-item" data-i="1">Sigmat</span>
+                    <span class="reel-word-item" data-i="2">FastChat</span>
+                    <span class="reel-word-item" data-i="3">Asistencia</span>
+                </div>
+
+                <!-- Pantallas -->
+                <div class="reel-screens">
+                    <figure class="reel-screen" data-i="0">
+                        <img src="assets/olimpo_1.png" alt="Aplicación Olimpo mostrando la rutina de entrenamiento" loading="lazy">
+                    </figure>
+                    <figure class="reel-screen" data-i="1">
+                        <img src="assets/math_3.png" alt="Panel financiero de Sigmat" loading="lazy">
+                    </figure>
+                    <figure class="reel-screen" data-i="2">
+                        <img src="assets/fastchat_1.png" alt="Bandeja de conversaciones de FastChatCenter" loading="lazy">
+                    </figure>
+                    <figure class="reel-screen" data-i="3">
+                        <img src="assets/nexus_2.gif" alt="Panel de métricas del sistema de asistencia" loading="lazy">
+                    </figure>
+                </div>
+
+                <!-- Pie que cambia con cada proyecto -->
+                <div class="reel-info">
+                    <p class="reel-line" data-i="0"><b>Entrenadores personales.</b> Rutinas, dietas, progreso y cobros. Web, Android y iPhone.</p>
+                    <p class="reel-line" data-i="1"><b>Clases particulares.</b> Alumnos, asistencia, notas y pagos, cada uno viendo solo lo suyo.</p>
+                    <p class="reel-line" data-i="2"><b>Atención al cliente.</b> WhatsApp, Messenger e Instagram en una sola bandeja, con varios agentes.</p>
+                    <p class="reel-line" data-i="3"><b>Recursos humanos.</b> Lee el reloj biométrico y calcula retardos sin revisión manual.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Contact Section (Cyber Data Transfer Portal) -->
-    <section id="contact" class="contact-section section-padding">
-        <div class="container">
-            <div class="section-header text-center">
-                <div class="section-badge">COMUNICACIÓN CON ENCRIPTACIÓN</div>
-                <h2 class="section-title">INICIAR CANAL DE DATOS</h2>
-                <div class="title-underline"></div>
+    <!-- ==================================================================
+         SERVICIOS
+         ================================================================== -->
+    <section class="band" id="servicios">
+        <div class="shell">
+            <div class="band-head rise">
+                <p class="tag">Servicios</p>
+                <div>
+                    <h2 class="band-title">Tres formas de trabajar juntos.</h2>
+                    <p class="band-lead">No vendo horas de programación. Entrego un producto que funciona el día que lo recibes, con su documentación y su código.</p>
+                </div>
             </div>
 
-            <div class="contact-box animate-scroll">
-                <div class="contact-terminal-header">
-                    <span class="terminal-dot red"></span>
-                    <span class="terminal-dot yellow"></span>
-                    <span class="terminal-dot green"></span>
-                    <span class="terminal-title">JPDevSlayer_SECURE_PORTAL.exe</span>
+            <div class="svc-grid">
+                <article class="svc rise">
+                    <div class="svc-mark" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"></rect><path d="M3 9h18M8 21h8"></path></svg>
+                    </div>
+                    <h3>Sistemas de gestión</h3>
+                    <p>El software que hace funcionar tu negocio por dentro: inventario, ventas, clientes, pagos, reportes. Con usuarios, permisos y base de datos propia.</p>
+                    <ul class="svc-list">
+                        <li>Múltiples roles y permisos</li>
+                        <li>Reportes y métricas en vivo</li>
+                        <li>Importación desde Excel</li>
+                    </ul>
+                    <a href="#contacto" class="svc-go" data-servicio="apps">
+                        Cotizar
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                    </a>
+                </article>
+
+                <article class="svc rise" style="--d: 90ms">
+                    <div class="svc-mark" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"></path></svg>
+                    </div>
+                    <h3>Sitios web</h3>
+                    <p>Páginas rápidas, que se ven bien en el teléfono y que salen en Google. Sin plantillas de WordPress ni plugins que se rompen a los seis meses.</p>
+                    <ul class="svc-list">
+                        <li>Diseño propio, no comprado</li>
+                        <li>Optimizado para móvil</li>
+                        <li>Formularios que sí llegan</li>
+                    </ul>
+                    <a href="#contacto" class="svc-go" data-servicio="web">
+                        Cotizar
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                    </a>
+                </article>
+
+                <article class="svc rise" style="--d: 180ms">
+                    <div class="svc-mark" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h4M8 9v4M15 12h.01M18 10h.01"></path><rect x="2" y="6" width="20" height="12" rx="4"></rect></svg>
+                    </div>
+                    <h3>Videojuegos</h3>
+                    <p>Desarrollo de juegos y experiencias interactivas para PC, móvil y navegador. Desde el prototipo jugable hasta la build publicable.</p>
+                    <ul class="svc-list">
+                        <li>Unity y motores web</li>
+                        <li>Prototipo jugable primero</li>
+                        <li>Build para PC, móvil o web</li>
+                    </ul>
+                    <a href="#contacto" class="svc-go" data-servicio="games">
+                        Cotizar
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                    </a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================
+         TRABAJOS
+         ================================================================== -->
+    <section class="band" id="trabajos">
+        <div class="shell">
+            <div class="band-head rise">
+                <p class="tag">Trabajos</p>
+                <div>
+                    <h2 class="band-title">Sistemas que hoy están en uso.</h2>
+                    <p class="band-lead">Cada uno resolvió un problema concreto de un negocio concreto. Toca cualquiera para ver las pantallas reales y cómo está construido por dentro.</p>
                 </div>
-                
-                <form class="contact-form" id="contactForm">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="name" class="terminal-label">>> IDENTIDAD / NOMBRE</label>
-                            <input type="text" id="name" required placeholder="Escribe tu nombre..." class="terminal-input">
+            </div>
+
+            <div class="filters" id="filters">
+                <button class="chip is-on" data-filter="all">Todos</button>
+                <button class="chip" data-filter="apps">Sistemas</button>
+                <button class="chip" data-filter="web">Sitios web</button>
+                <button class="chip" data-filter="games">Videojuegos</button>
+            </div>
+
+            <div class="work" id="work">
+                <article class="work-card is-wide rise" data-category="apps" data-project="fastchat" tabindex="0" role="button" aria-label="Ver detalles de FastChatCenter">
+                    <div class="work-frame">
+                        <div class="work-bar" aria-hidden="true">
+                            <span class="work-dots"><i></i><i></i><i></i></span>
+                            <span class="work-url">fastchatcenter · bandeja compartida</span>
                         </div>
-                        <div class="form-group">
-                            <label for="email" class="terminal-label">>> CANAL DE RESPUESTA / EMAIL</label>
-                            <input type="email" id="email" required placeholder="tu@correo.com" class="terminal-input">
+                        <div class="work-shot">
+                            <img src="assets/fastchat_1.png" alt="Bandeja compartida de FastChatCenter" loading="lazy">
+                        </div>
+                    </div>
+                    <div class="work-body">
+                        <div class="work-meta">
+                            <span class="pill">En producción</span>
+                            <span>Atención al cliente</span>
+                        </div>
+                        <h3 class="work-title">FastChatCenter</h3>
+                        <p class="work-desc">WhatsApp, Messenger e Instagram en una sola bandeja. Varios agentes atienden a la vez sin pisarse: cada mensaje se vuelve un ticket que se asigna, se responde y se cierra. Con chatbots por departamento, campañas e informes de tiempo de respuesta.</p>
+                        <div class="work-tech">
+                            <span>React</span><span>TypeScript</span><span>Node.js</span><span>MySQL</span><span>WebSockets</span><span>API de Meta</span>
+                        </div>
+                        <div class="work-foot">
+                            <div class="work-nums">
+                                <span><b>3</b>canales</span>
+                                <span><b>Multi</b>empresa</span>
+                                <span><b>7</b>capturas</span>
+                            </div>
+                            <span class="work-open">
+                                Ver el caso
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                            </span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="work-card rise" data-category="apps" data-project="olimpo" tabindex="0" role="button" aria-label="Ver detalles de Olimpo">
+                    <div class="work-frame">
+                        <div class="work-bar" aria-hidden="true">
+                            <span class="work-dots"><i></i><i></i><i></i></span>
+                            <span class="work-url">olimpo · rutina del día</span>
+                        </div>
+                        <div class="work-shot">
+                            <img src="assets/olimpo_1.png" alt="Aplicación Olimpo mostrando la rutina del día" loading="lazy">
+                        </div>
+                    </div>
+                    <div class="work-body">
+                        <div class="work-meta">
+                            <span class="pill is-wip">En construcción</span>
+                            <span>Fitness</span>
+                        </div>
+                        <h3 class="work-title">Olimpo</h3>
+                        <p class="work-desc">El gimnasio entero de un entrenador dentro del teléfono de sus clientes: rutinas, dietas con calorías, progreso con fotos, cobro de cuotas y chat en vivo.</p>
+                        <div class="work-tech">
+                            <span>Next.js</span><span>TypeScript</span><span>PostgreSQL</span><span>Android</span><span>iOS</span>
+                        </div>
+                        <div class="work-foot">
+                            <div class="work-nums">
+                                <span><b>3</b>plataformas</span>
+                                <span><b>1.300+</b>ejercicios</span>
+                            </div>
+                            <span class="work-open">
+                                Ver el caso
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                            </span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="work-card rise" style="--d: 90ms" data-category="apps" data-project="sigma" tabindex="0" role="button" aria-label="Ver detalles de Sigmat">
+                    <div class="work-frame">
+                        <div class="work-bar" aria-hidden="true">
+                            <span class="work-dots"><i></i><i></i><i></i></span>
+                            <span class="work-url">sigmat · panel financiero</span>
+                        </div>
+                        <div class="work-shot">
+                            <img src="assets/math_3.png" alt="Panel financiero de Sigmat" loading="lazy">
+                        </div>
+                    </div>
+                    <div class="work-body">
+                        <div class="work-meta">
+                            <span class="pill">Entregado</span>
+                            <span>Educación</span>
+                        </div>
+                        <h3 class="work-title">Sigmat</h3>
+                        <p class="work-desc">Portal para clases particulares. La profesora registra alumnos, asistencia, notas y pagos; cada estudiante entra con su usuario y ve solo lo suyo, con la seguridad aplicada en la base de datos.</p>
+                        <div class="work-tech">
+                            <span>JavaScript</span><span>Supabase Auth</span><span>PostgreSQL</span><span>RLS</span>
+                        </div>
+                        <div class="work-foot">
+                            <div class="work-nums">
+                                <span><b>2</b>portales</span>
+                                <span><b>RLS</b>en base</span>
+                                <span><b>8</b>capturas</span>
+                            </div>
+                            <span class="work-open">
+                                Ver el caso
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                            </span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="work-card is-wide rise" style="--d: 180ms" data-category="apps" data-project="asistencia" tabindex="0" role="button" aria-label="Ver detalles de Asistencia">
+                    <div class="work-frame">
+                        <div class="work-bar" aria-hidden="true">
+                            <span class="work-dots"><i></i><i></i><i></i></span>
+                            <span class="work-url">asistencia · motor analítico</span>
+                        </div>
+                        <div class="work-shot">
+                            <img src="assets/nexus_2.gif" alt="Panel de métricas del sistema de asistencia" loading="lazy">
+                        </div>
+                    </div>
+                    <div class="work-body">
+                        <div class="work-meta">
+                            <span class="pill">En producción</span>
+                            <span>Recursos humanos</span>
+                        </div>
+                        <h3 class="work-title">Asistencia</h3>
+                        <p class="work-desc">Lee el Excel del reloj biométrico tal como sale, agrupa las marcaciones de cada persona por día y calcula los retardos contra su horario. Lo que era una revisión manual de horas queda resuelto en segundos.</p>
+                        <div class="work-tech">
+                            <span>React</span><span>Vite</span><span>SheetJS</span><span>Tailwind</span>
+                        </div>
+                        <div class="work-foot">
+                            <div class="work-nums">
+                                <span><b>Excel</b>de entrada</span>
+                                <span><b>0</b>revisión manual</span>
+                            </div>
+                            <span class="work-open">
+                                Ver el caso
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                            </span>
+                        </div>
+                    </div>
+                </article>
+
+                <div class="empty" id="empty" hidden>
+                    <p class="tag">Sin casos públicos</p>
+                    <h3>Todavía no hay trabajos publicados en esta categoría.</h3>
+                    <p>Los proyectos de esta área están en desarrollo o bajo acuerdo de confidencialidad con el cliente.</p>
+                    <a href="#contacto" class="btn btn-line">Sé el primero</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================
+         STACK
+         ================================================================== -->
+    <section class="band" id="stack">
+        <div class="shell">
+            <div class="band-head rise">
+                <p class="tag">Stack</p>
+                <div>
+                    <h2 class="band-title">Con qué está construido.</h2>
+                    <p class="band-lead">Las herramientas que uso de verdad en los proyectos que entrego. Sin barras de porcentaje: nadie puede medir un lenguaje en números y tú no deberías confiar en quien lo intente.</p>
+                </div>
+            </div>
+
+            <div class="stack-grid">
+                <div class="stack-col rise">
+                    <h3>Interfaz</h3>
+                    <ul>
+                        <li>React 18</li>
+                        <li>TypeScript</li>
+                        <li>JavaScript ES6</li>
+                        <li>Tailwind CSS</li>
+                        <li>CSS moderno (Grid, contenedores)</li>
+                        <li>Vite</li>
+                    </ul>
+                    <p class="stack-note">Lo que el cliente toca. Sin plantillas compradas: cada pantalla se diseña para el flujo real del negocio.</p>
+                </div>
+
+                <div class="stack-col rise" style="--d: 90ms">
+                    <h3>Datos y servidor</h3>
+                    <ul>
+                        <li>PostgreSQL</li>
+                        <li>Supabase (Auth, Storage)</li>
+                        <li>Row Level Security</li>
+                        <li>Triggers y funciones SQL</li>
+                        <li>Node.js</li>
+                        <li>Python</li>
+                    </ul>
+                    <p class="stack-note">Donde vive la información. Los permisos se aplican en la base de datos, no solo en la pantalla: es la diferencia entre parecer seguro y serlo.</p>
+                </div>
+
+                <div class="stack-col rise" style="--d: 180ms">
+                    <h3>Entrega</h3>
+                    <ul>
+                        <li>Git y GitHub</li>
+                        <li>Vercel</li>
+                        <li>Dominio y certificado SSL</li>
+                        <li>Documentación del proyecto</li>
+                        <li>Capacitación de uso</li>
+                    </ul>
+                    <p class="stack-note">Termino cuando el sistema está en línea, tú sabes usarlo y el código es tuyo. No hay dependencia de por vida conmigo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================
+         PROCESO — la numeración aquí sí significa algo: es una secuencia
+         ================================================================== -->
+    <section class="band" id="proceso">
+        <div class="shell">
+            <div class="band-head rise">
+                <p class="tag">Proceso</p>
+                <div>
+                    <h2 class="band-title">Cómo es trabajar conmigo.</h2>
+                    <p class="band-lead">Cuatro etapas, en este orden. Sabes en qué punto está tu proyecto en todo momento y qué recibes al final de cada una.</p>
+                </div>
+            </div>
+
+            <div class="flow">
+                <article class="flow-step rise">
+                    <span class="flow-n">01</span>
+                    <h3>Conversación</h3>
+                    <p>Me cuentas qué necesitas resolver, no qué software quieres. Salgo de ahí con el alcance escrito, el precio cerrado y una fecha. Sin costo y sin compromiso.</p>
+                </article>
+
+                <article class="flow-step rise">
+                    <span class="flow-n">02</span>
+                    <h3>Diseño</h3>
+                    <p>Antes de programar una línea, ves cómo se va a ver y cómo va a funcionar. Aquí se cambia todo lo que haga falta, que es cuando cambiar sale barato.</p>
+                </article>
+
+                <article class="flow-step rise">
+                    <span class="flow-n">03</span>
+                    <h3>Desarrollo</h3>
+                    <p>Programo con entregas parciales que puedes abrir y probar. Nada de desaparecer un mes y reaparecer con una sorpresa.</p>
+                </article>
+
+                <article class="flow-step rise">
+                    <span class="flow-n">04</span>
+                    <h3>Entrega</h3>
+                    <p>El sistema queda en línea, con tu dominio, tu código fuente y tu documentación. Te enseño a usarlo y quedo disponible para el soporte acordado.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================
+         PRECIOS
+         ================================================================== -->
+    <section class="band" id="precios">
+        <div class="shell">
+            <div class="band-head rise">
+                <p class="tag">Precios</p>
+                <div>
+                    <h2 class="band-title">Cuánto cuesta.</h2>
+                    <p class="band-lead">Precios de arranque para que sepas si encajamos antes de escribirme. El número final depende del alcance, y lo cerramos en la primera conversación.</p>
+                </div>
+            </div>
+
+            <div class="tiers">
+                <article class="tier rise">
+                    <div class="tier-top">
+                        <span class="tier-name">Sitio web</span>
+                    </div>
+                    <!-- PRECIO PENDIENTE: cuando tengas el número, cambia este bloque por
+                         <span class="tier-from">Desde</span>
+                         <span class="tier-amount">$500</span>   (con tu cifra) -->
+                    <div class="tier-price">
+                        <span class="tier-amount tier-amount-texto">A convenir</span>
+                    </div>
+                    <p class="tier-desc">Para negocios que necesitan presencia seria en internet y un canal por donde les escriban.</p>
+                    <ul>
+                        <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Diseño propio, hasta 5 secciones</li>
+                        <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Adaptado a móvil</li>
+                        <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Formulario y WhatsApp</li>
+                        <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Publicación con tu dominio</li>
+                    </ul>
+                    <a href="#contacto" class="btn btn-line" data-servicio="web">Cotizar</a>
+                </article>
+
+                <article class="tier is-featured rise" style="--d: 90ms">
+                    <div class="tier-top">
+                        <span class="tier-name">Sistema de gestión</span>
+                        <span class="tier-badge">Más pedido</span>
+                    </div>
+                    <!-- PRECIO PENDIENTE: cuando tengas el número, cambia este bloque por
+                         <span class="tier-from">Desde</span>
+                         <span class="tier-amount">$500</span>   (con tu cifra) -->
+                    <div class="tier-price">
+                        <span class="tier-amount tier-amount-texto">A convenir</span>
+                    </div>
+                    <p class="tier-desc">El software interno que hace funcionar tu negocio. Es lo que construí para BODEGA-3 y Sigma.</p>
+                    <ul>
+                        <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Base de datos propia</li>
+                        <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Usuarios, roles y permisos</li>
+                        <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Reportes y métricas</li>
+                        <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Capacitación incluida</li>
+                        <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Código fuente entregado</li>
+                    </ul>
+                    <a href="#contacto" class="btn btn-solid" data-servicio="apps">Cotizar</a>
+                </article>
+
+                <article class="tier rise" style="--d: 180ms">
+                    <div class="tier-top">
+                        <span class="tier-name">Videojuego</span>
+                    </div>
+                    <!-- PRECIO PENDIENTE: cuando tengas el número, cambia este bloque por
+                         <span class="tier-from">Desde</span>
+                         <span class="tier-amount">$500</span>   (con tu cifra) -->
+                    <div class="tier-price">
+                        <span class="tier-amount tier-amount-texto">A convenir</span>
+                    </div>
+                    <p class="tier-desc">Desde una idea hasta un juego que se puede jugar y publicar. Se cotiza por alcance.</p>
+                    <ul>
+                        <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Prototipo jugable primero</li>
+                        <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Mecánicas a medida</li>
+                        <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Build para PC, móvil o web</li>
+                    </ul>
+                    <a href="#contacto" class="btn btn-line" data-servicio="games">Cotizar</a>
+                </article>
+            </div>
+
+            <p class="tiers-note">Los proyectos se trabajan con 50% al inicio y 50% contra entrega. El precio se cierra por escrito antes de empezar: no hay costos que aparezcan a mitad de camino.</p>
+        </div>
+    </section>
+
+    <!-- ==================================================================
+         CONTACTO
+         ================================================================== -->
+    <section class="band" id="contacto">
+        <div class="shell">
+            <div class="contact-grid">
+                <div class="contact-aside rise">
+                    <p class="tag" style="margin-bottom: 1.5rem;">Contacto</p>
+                    <h2>Cuéntame qué necesitas resolver.</h2>
+                    <p>No hace falta que sepas qué tecnología usar ni cómo se llama lo que buscas. Explícame el problema de tu negocio y yo te digo qué se puede hacer y cuánto cuesta.</p>
+
+                    <div class="direct">
+                        <a href="#" id="waDirect" target="_blank" rel="noopener" hidden>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884a9.82 9.82 0 0 1 6.988 2.898 9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.548 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                            <span>
+                                <b>WhatsApp</b>
+                                <span id="waNumber">Respuesta directa</span>
+                            </span>
+                        </a>
+
+                        <a href="https://github.com/militian007" target="_blank" rel="noopener">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                            <span>
+                                <b>GitHub</b>
+                                <span>Código público</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+                <form class="form rise" id="form" style="--d: 90ms">
+                    <div class="form-row">
+                        <div class="field">
+                            <label for="nombre">Tu nombre</label>
+                            <input type="text" id="nombre" required placeholder="Cómo te llamas">
+                        </div>
+                        <div class="field">
+                            <label for="correo">Tu correo</label>
+                            <input type="email" id="correo" required placeholder="tu@correo.com">
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="projectType" class="terminal-label">>> TIPO DE PROYECTO</label>
-                        <select id="projectType" class="terminal-input terminal-select">
-                            <option value="default" disabled selected>Selecciona un módulo...</option>
-                            <option value="web">Páginas Web Ultra-Modernas</option>
-                            <option value="games">Desarrollo de Videojuego</option>
-                            <option value="apps">Programa o Aplicación de Escritorio/Móvil</option>
-                            <option value="other">Otro Requerimiento Tecnológico</option>
+                    <div class="field">
+                        <label for="servicio">Qué necesitas</label>
+                        <select id="servicio">
+                            <option value="" disabled selected>Elige una opción</option>
+                            <option value="apps">Un sistema de gestión</option>
+                            <option value="web">Un sitio web</option>
+                            <option value="games">Un videojuego</option>
+                            <option value="other">Todavía no lo tengo claro</option>
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label for="message" class="terminal-label">>> DETALLES DE LA MISIÓN / MENSAJE</label>
-                        <textarea id="message" rows="5" required placeholder="Describe los detalles de tu proyecto..." class="terminal-input"></textarea>
+                    <div class="field">
+                        <label for="detalle">Cuéntame el problema</label>
+                        <textarea id="detalle" rows="5" required placeholder="Qué necesitas resolver, cómo lo haces hoy y para cuándo lo necesitas."></textarea>
                     </div>
 
-
-                    <!-- Honeypot anti-spam: invisible para humanos, los bots la rellenan -->
-                    <div class="hp-field" aria-hidden="true">
-                        <label for="company_website">No rellenar este campo</label>
-                        <input type="text" id="company_website" name="_gotcha" tabindex="-1" autocomplete="off">
-                    </div>
-                    <div class="terminal-status-log" id="statusLog">
-                        <span class="status-line">>> Esperando entrada del operador...</span>
+                    <!-- Trampa anti-spam: invisible para humanos, los bots la rellenan -->
+                    <div class="trap" aria-hidden="true">
+                        <label for="empresa_web">No rellenar</label>
+                        <input type="text" id="empresa_web" name="_gotcha" tabindex="-1" autocomplete="off">
                     </div>
 
-                    <div class="form-footer">
-                        <button type="submit" class="btn btn-primary btn-submit">
-                            <span class="btn-text">INICIAR TRANSFERENCIA DE DATOS</span>
-                            <span class="btn-scan"></span>
-                        </button>
+                    <div class="form-status" id="status" role="status" aria-live="polite">
+                        <span>Respondo en menos de 24 horas.</span>
                     </div>
+
+                    <button type="submit" class="btn btn-solid">Enviar mensaje</button>
                 </form>
             </div>
         </div>
     </section>
 
-    <!-- Footer Section -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-top">
-                <div class="footer-brand">
-                    <div class="footer-logo-wrapper">
-                        <img src="assets/logo.png" alt="Logo de JPDevSlayer" class="footer-logo">
-                    </div>
-                    <span class="footer-brand-name">JPDevSlayer</span>
-                </div>
-                <div class="footer-socials">
-                    <a href="https://github.com/militian007" target="_blank" aria-label="GitHub" class="social-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+    <!-- ==================================================================
+         PIE
+         ================================================================== -->
+    <footer class="foot">
+        <div class="shell">
+            <div class="foot-top">
+                <a href="#top" class="brand">
+                    <img src="assets/logo.png" alt="">
+                    <span>JPDevSlayer</span>
+                </a>
+
+                <div class="socials">
+                    <a href="https://github.com/militian007" target="_blank" rel="noopener" aria-label="GitHub">
+                        <svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
                     </a>
-                    <a href="https://www.instagram.com/jpdevslayer/" target="_blank" aria-label="Instagram" class="social-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                    </a>
-                    <a href="https://linkedin.com" target="_blank" aria-label="LinkedIn" class="social-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                    </a>
-                    <a href="https://discord.com" target="_blank" aria-label="Discord" class="social-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
+                    <a href="https://www.instagram.com/jpdevslayer/" target="_blank" rel="noopener" aria-label="Instagram">
+                        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                     </a>
                 </div>
             </div>
-            
-            <div class="footer-separator"></div>
 
-            <div class="footer-bottom">
-                <p class="copyright">&copy; 2026 JPDevSlayer. TODOS LOS DERECHOS RESERVADOS. CÓDIGO AUTÓNOMO EJECUTADO.</p>
-                <div class="footer-metrics">
-                    <span class="metric"><span class="dot green"></span> SYSTEM STATUS: OPERATIONAL</span>
-                    <span class="metric">LOAD: 12%</span>
-                    <span class="metric">UPTIME: 99.98%</span>
-                </div>
+            <div class="foot-bottom">
+                <span>&copy; 2026 JPDevSlayer</span>
+                <span>Hecho a mano, sin plantillas</span>
             </div>
         </div>
     </footer>
 
-    <!-- Holographic Project Details Modal -->
-    <div id="projectModal" class="project-modal">
-        <div class="modal-backdrop" id="modalBackdrop"></div>
-        <div class="modal-wrapper">
-            <div class="modal-header">
-                <div class="modal-header-tag">
-                    <span class="modal-subtitle">CASE STUDY // SYSTEM PREVIEW</span>
-                    <div class="header-tag-glow"></div>
-                </div>
-                <h3 class="modal-title" id="modalTitle">PROJECT DETAILS</h3>
-                <button class="modal-close" id="modalCloseBtn" aria-label="Cerrar detalles">&times;</button>
+    <!-- WhatsApp flotante. Se muestra solo si SITE_CONFIG.WHATSAPP tiene número -->
+    <a href="#" class="wa" id="wa" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp" hidden>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884a9.82 9.82 0 0 1 6.988 2.898 9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.548 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+        <span>Hablemos de tu proyecto</span>
+    </a>
+
+    <!-- Modal de proyecto -->
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-veil" id="modalVeil"></div>
+        <div class="modal-panel">
+            <div class="modal-head">
+                <h3 id="modalTitle">Proyecto</h3>
+                <button class="modal-x" id="modalX" aria-label="Cerrar">&times;</button>
             </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Content dynamically populated by script.js -->
-            </div>
+            <div class="modal-body" id="modalBody"></div>
         </div>
     </div>
 
-    <!-- JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>

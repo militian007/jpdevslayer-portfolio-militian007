@@ -14,7 +14,7 @@ La web comercial de JPDevSlayer. Un sitio de una sola página donde un cliente p
 2. Revisa los proyectos ya entregados, con capturas reales y ficha técnica.
 3. Pide su proyecto por formulario o por WhatsApp.
 
-La estética es cyberpunk: fondo oscuro, neón cian, partículas de circuito, efectos de terminal y sonidos sintetizados. Es deliberado y es parte del producto — no lo "simplifiques" sin hablarlo.
+La estética es de taller de ingeniería: fondo azul pizarra muy oscuro, azul hielo sacado del propio logo, tipografía ancha y pesada, y movimiento movido por el scroll. **No es cyberpunk**: el cian neón sobre negro con resplandor se retiró a propósito el 2026-08-20 porque es el aspecto que produce toda IA cuando le piden "futurista", y el cliente lo rechazó por genérico.
 
 Lo que **no** es: un currículum, ni un blog, ni un experimento visual. Si un cambio se ve espectacular pero enfría el contacto con el cliente, no entra.
 
@@ -32,7 +32,7 @@ HTML, CSS y JavaScript puro. Sin framework, sin bundler, sin transpilación.
 | Fondo | HTML5 Canvas, partículas dibujadas en tiempo real |
 | Sonido | Web Audio API, sintetizado, sin archivos mp3 |
 | Formulario | Formspree (servicio externo) |
-| Tipografías | Inter y Orbitron desde Google Fonts |
+| Tipografías | Archivo, IBM Plex Sans e IBM Plex Mono desde Google Fonts |
 | Despliegue | Vercel, estático |
 
 **No hay `package.json`.** Si escribes `npm install` en esta carpeta, no va a pasar nada útil.
@@ -202,7 +202,8 @@ Ordenados por impacto comercial:
 | Prioridad | Pendiente |
 |---|---|
 | Alta | Cargar `FORMSPREE_ID` para que los mensajes lleguen al correo |
-| Alta | Capa comercial: precios o paquetes, proceso de trabajo, testimonios de clientes reales |
+| Alta | **Los tres precios dicen "A convenir".** Falta la cifra de arranque de cada paquete. En `index.html`, buscar `PRECIO PENDIENTE`: el comentario indica exactamente qué poner. |
+| Alta | Testimonios de clientes reales (hacen falta citas de verdad, no inventadas) |
 | Media | Aprovechar las 31 capturas sin usar, sobre todo en SIGMA |
 | Media | Favicon (no existe) y `og:image` con URL absoluta — hoy la vista previa al compartir por WhatsApp o LinkedIn sale rota |
 | Media | `canonical` y `og:url`: hay dos dominios sirviendo el mismo sitio |
@@ -215,4 +216,62 @@ Ordenados por impacto comercial:
 
 | Fecha | Cambio |
 |---|---|
+| 2026-08-20 | **Rediseño desplegado a producción.** Se fusionó `rediseno-2026` en `main`. Los tres precios salen como "A convenir" en lugar de la cifra: el marcador `$PRECIO` se habría visto como un error de programación en la web pública, y las cifras reales todavía no están definidas. Buscar `PRECIO PENDIENTE` en `index.html` para cambiarlas. |
+| 2026-08-20 | **Estrellas del hero y limpieza de capturas.** Se recuperó el campo de partículas conectadas del sitio anterior a petición del cliente, ahora solo dentro del hero, en el azul del logo y sin la cuadrícula del original; se pausa con `IntersectionObserver` cuando el hero sale de pantalla. Se retiraron de Sigmat las capturas `math_5` a `math_8`: no eran pantallas de la app sino del panel de Supabase (editor SQL, avisos de RLS y **una con la clave de API a la vista**), y llevaban descripciones inventadas. Sigmat queda con 4 capturas reales. |
+| 2026-08-20 | **Tarjetas de trabajo rediseñadas y capturas ampliadas.** Las tarjetas pasaron de un bloque plano a una pieza con tres capas: la captura vive dentro de una ventana de navegador dibujada (semáforo y barra de dirección), la tarjeta se inclina en perspectiva siguiendo el cursor y un foco de luz lo acompaña; abajo, una ficha con cifras del proyecto. Capturas por proyecto: Olimpo 5, Sigmat 8, FastChatCenter 7, Asistencia 4. Las de FastChatCenter se generaron levantando el proyecto en local (Docker + backend + frontend) y **anonimizando nombres, teléfonos y correos de contactos reales** antes de guardarlas. Olimpo tiene una sola pantalla real de la app: se compuso una escena 16:9 repitiendo el teléfono en tres profundidades sobre el halo de marca, porque la captura vertical suelta no encajaba con el resto. |
+| 2026-08-20 | **Rediseño completo (rama `rediseno-2026`).** Se retiró la estética cian-sobre-negro con cuadrícula y partículas. Paleta nueva muestreada del propio logo (tono 190-210°, azul hielo `#5AC8E8`) sobre fondo azul pizarra `#0A0E14`, sin resplandor. Tipografías Archivo, IBM Plex Sans y IBM Plex Mono. El logo pasó de 30 px en la barra a ser el protagonista del hero: arranca a 340 px y el scroll lo encoge y lo lleva hasta su hueco en la barra (verificado, aterriza a 1 px del destino). Nueva sección `#reel`: anclada con `position: sticky` sobre un recorrido de 420svh, donde el scroll mueve la secuencia de los 4 proyectos con su palabra gigante detrás, contador y barra de avance. Botones magnéticos. Proyectos actualizados: entran Olimpo, FastChatCenter y Asistencia; sale BODEGA-3. Capturas de FastChatCenter generadas levantando el proyecto en local, con los nombres de contactos reales anonimizados. |
 | 2026-08-19 | Creada la carpeta `contexto/` con los 3 archivos, siguiendo la estructura de `sigmamath`. Absorbido y retirado el antiguo `docs/CONTEXTO_DEL_PROYECTO.md`. Formulario de contacto migrado de simulación a envío real por Formspree, con honeypot y canal alterno de WhatsApp. Botón flotante de WhatsApp configurado con `+58 424-1237997`. Eliminados los 4 proyectos sin capturas reales; quedan SIGMA, BODEGA-3 y NEXUS. Añadido estado vacío para filtros sin resultados. Corregido el desbordamiento horizontal en móvil que ya venía de producción, y añadido `flex-wrap` a los filtros. Verificado en navegador a 375 px y 1274 px, y otra vez ya desplegado en `https://jpdevslayer.com`. Commit `c85eba1`. |
+
+---
+
+## 12. Movimiento: la regla que se aplica aquí
+
+El sistema operativo puede pedir menos movimiento (`prefers-reduced-motion`). En este proyecto esa señal **no apaga todo**, se aplica con criterio:
+
+- **Se apaga el movimiento automático:** la marquesina de tecnologías, los anillos que giran, la luz que respira y el indicador de "baja". Es movimiento que ocurre sin que el visitante haga nada.
+- **Se conserva el movimiento que mueve el visitante:** el sello que viaja al hacer scroll y toda la secuencia del reel. Ahí el scroll no dispara una animación, el scroll **es** la animación: es manipulación directa, no movimiento impuesto.
+
+Esto se decidió el 2026-08-20 porque un apagado total dejaba la página sin nada que mostrar en máquinas con los efectos de Windows desactivados, que es el caso de la PC del propio dueño.
+
+### El motor de scroll
+
+Hay **un solo** bucle (`scrollFx` en `script.js`). Cada pieza movida por scroll registra su función ahí y todas se ejecutan en el mismo `requestAnimationFrame`. No agregues un `addEventListener('scroll')` por efecto: eso es lo que hace que una página se sienta pesada.
+
+### El reel no funciona en pantallas pequeñas
+
+Vive del anclaje y de un recorrido de 420svh. En un teléfono no hay recorrido suficiente y las cuatro capturas terminaban una encima de otra. Por eso **se oculta por debajo de 760 px de ancho**: la sección de Trabajos muestra los mismos proyectos con más detalle.
+
+---
+
+## 13. Capturas de los proyectos: de dónde salen y qué cuidar
+
+| Proyecto | Origen de las capturas | Cuidado |
+|---|---|---|
+| **FastChatCenter** | Proyecto levantado en local (`docker compose up -d` + `npm run dev` en `backend/` y `frontend/`), con Chrome controlado por el protocolo DevTools | **Trae datos de clientes reales.** Nombres, teléfonos y correos se reemplazan en el DOM *antes* de capturar. Nunca publicar una captura sin verificar que no queda ningún dato personal. |
+| **Sigmat** | Ya estaban en `assets/` desde antes | La captura del panel muestra el nombre de la clienta (Prof. Diana Matson). Está en producción desde antes, pero conviene confirmarlo con ella. |
+| **Olimpo** | Página de presentación pública (`olimpo-gray.vercel.app/presentacion`) | Solo existe **una** pantalla real de la app. `olimpo_1.png` es una escena compuesta con esa única pantalla repetida. Si algún día se levanta Olimpo completo (necesita Docker, migraciones y el puerto 3000), conviene reemplazarla por capturas reales. |
+| **Asistencia** | GIFs previos + la app levantada en local con Vite | La app arranca vacía: sin un Excel del reloj cargado solo se ve la pantalla de subida. |
+
+### La herramienta de captura
+
+`shot.mjs` (en el scratchpad de la sesión) controla Chrome por el protocolo DevTools a partir de un guion JSON: navega, ejecuta JavaScript en la página y captura. Sirve para apps con login y para fotografiar el propio portafolio a distintas alturas de scroll, que es la única forma de revisar el reel anclado.
+
+**Ojo con los puertos:** FastChatCenter usa el 3000 (frontend) y el 8080 (backend). Por eso el servidor local del portafolio se movió al **8123** en `.claude/launch.json`.
+
+---
+
+## 14. Las estrellas del hero
+
+`initEstrellas()` en `script.js`. Es el sistema de partículas del sitio anterior, recuperado por decisión del cliente, con tres cambios:
+
+- **Vive solo dentro del hero**, no en toda la página. El canvas se mide contra `#top`.
+- **Color del logo** (`rgba(90, 200, 232, …)`) en vez del cian neón original.
+- **Sin la cuadrícula de fondo** que traía el código viejo.
+
+Se pausa con `IntersectionObserver` cuando el hero sale de pantalla: dejarlo corriendo toda la página gasta batería sin motivo.
+
+**Es la única animación automática que NO respeta `prefers-reduced-motion`.** Fue una petición explícita del cliente, que quiere verla en su propia máquina (donde los efectos de Windows están desactivados). Si algún día se prioriza la accesibilidad sobre esa preferencia, el arreglo es dibujar un solo fotograma estático en vez de arrancar el bucle.
+
+### Capturas: verificar antes de publicar
+
+El 2026-08-20 se retiraron cuatro capturas de Sigmat que parecían pantallas de la app y en realidad eran del panel de Supabase, incluida una con la clave de API a la vista. **Antes de añadir una captura, ábrela y míralo**: que sea de la aplicación, no de un panel de administración, y que no tenga claves, correos ni teléfonos.

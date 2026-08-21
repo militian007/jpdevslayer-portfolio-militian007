@@ -9,11 +9,10 @@
       - Copia SOLO la última parte (ej: xayzwqbk) y pégala abajo.
       - El plan gratis permite 50 mensajes al mes.
       Mientras diga "PEGA-AQUI", el formulario le avisará al visitante y le
-      ofrecerá WhatsApp o correo como canal alterno.
+      ofrecerá WhatsApp como canal alterno.
 
    2) WHATSAPP  (botón flotante + canal alterno del formulario)
       - Tu número en formato internacional, SOLO DÍGITOS, sin +, sin espacios.
-      - Ejemplos:  Venezuela '584121234567'  ·  España '34600112233'
       - Si lo dejas vacío, el botón flotante no aparece.
 
    3) EMAIL_CONTACTO  (opcional, canal alterno si falla el envío)
@@ -27,822 +26,984 @@ const SITE_CONFIG = {
 
 
 /* ==========================================================================
-   PARTICLE CANVAS SYSTEM (CIRCUIT BOARD PARTICLES)
+   UTILIDADES
    ========================================================================== */
-const canvas = document.getElementById('particleCanvas');
-const ctx = canvas.getContext('2d');
 
-let particlesArray = [];
-const maxParticles = 60;
-const connectionDistance = 110;
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
-// Mouse coordinates
-let mouse = {
-    x: null,
-    y: null,
-    radius: 120
-};
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-window.addEventListener('mousemove', (event) => {
-    mouse.x = event.x;
-    mouse.y = event.y;
-});
-
-window.addEventListener('mouseout', () => {
-    mouse.x = null;
-    mouse.y = null;
-});
-
-// Setup canvas size
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-// Particle Class
-class Particle {
-    constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 1;
-        this.speedX = (Math.random() - 0.5) * 0.4;
-        this.speedY = (Math.random() - 0.5) * 0.4;
-        this.color = 'rgba(0, 240, 255, 0.4)';
-    }
-
-    update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-
-        // Bounce on boundaries
-        if (this.x < 0 || this.x > canvas.width) this.speedX = -this.speedX;
-        if (this.y < 0 || this.y > canvas.height) this.speedY = -this.speedY;
-
-        // Interaction with mouse
-        if (mouse.x !== null && mouse.y !== null) {
-            let dx = mouse.x - this.x;
-            let dy = mouse.y - this.y;
-            let distance = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distance < mouse.radius) {
-                // Attract slightly
-                this.x += dx * 0.01;
-                this.y += dy * 0.01;
-            }
-        }
-    }
-
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-    }
-}
-
-// Initialize Particle Array
-function initParticles() {
-    particlesArray = [];
-    for (let i = 0; i < maxParticles; i++) {
-        particlesArray.push(new Particle());
-    }
-}
-
-// Draw connection lines
-function drawConnections() {
-    for (let a = 0; a < particlesArray.length; a++) {
-        for (let b = a + 1; b < particlesArray.length; b++) {
-            let dx = particlesArray[a].x - particlesArray[b].x;
-            let dy = particlesArray[a].y - particlesArray[b].y;
-            let distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < connectionDistance) {
-                let opacity = (1 - (distance / connectionDistance)) * 0.15;
-                ctx.strokeStyle = `rgba(0, 240, 255, ${opacity})`;
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-                ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
-                ctx.stroke();
-            }
-        }
-    }
-}
-
-// Animation Loop
-function animateParticles() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw grid background subtly
-    ctx.strokeStyle = 'rgba(0, 240, 255, 0.01)';
-    ctx.lineWidth = 0.5;
-    const gridSpacing = 80;
-    for (let x = 0; x < canvas.width; x += gridSpacing) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
-    }
-    for (let y = 0; y < canvas.height; y += gridSpacing) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-    }
-
-    for (let i = 0; i < particlesArray.length; i++) {
-        particlesArray[i].update();
-        particlesArray[i].draw();
-    }
-    drawConnections();
-    requestAnimationFrame(animateParticles);
-}
-
-initParticles();
-animateParticles();
-
-
-/* ==========================================================================
-   WEB AUDIO API - SYNTH AUDIO SYSTEM (NO FILES NEEDED)
-   ========================================================================== */
-let audioCtx = null;
-let soundEnabled = false;
-
-const soundToggle = document.getElementById('soundToggle');
-const soundOnIcon = soundToggle.querySelector('.sound-on-icon');
-const soundOffIcon = soundToggle.querySelector('.sound-off-icon');
-
-// Try load sound preference from local storage
-if (localStorage.getItem('jpdevslayer_sound') === 'enabled') {
-    soundEnabled = true;
-    soundOnIcon.classList.remove('d-none');
-    soundOffIcon.classList.add('d-none');
-}
-
-soundToggle.addEventListener('click', () => {
-    soundEnabled = !soundEnabled;
-    
-    if (soundEnabled) {
-        soundOnIcon.classList.remove('d-none');
-        soundOffIcon.classList.add('d-none');
-        localStorage.setItem('jpdevslayer_sound', 'enabled');
-        playSynthBeep(600, 0.05, 'triangle'); // Confirm beep
-    } else {
-        soundOnIcon.classList.add('d-none');
-        soundOffIcon.classList.remove('d-none');
-        localStorage.setItem('jpdevslayer_sound', 'disabled');
-    }
-});
-
-// Synthesizer Function to generate high-tech sound effects
-function playSynthBeep(frequency = 800, duration = 0.03, type = 'sine') {
-    if (!soundEnabled) return;
-
-    try {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-
-        osc.type = type;
-        osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-        
-        gain.gain.setValueAtTime(0.04, audioCtx.currentTime); // Low volume
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
-    } catch (e) {
-        console.error('AudioContext error:', e);
-    }
-}
-
-// Add sound effects to interactive items
-function attachSoundEffects() {
-    const clickables = document.querySelectorAll('a, button, input, select, textarea, .project-card, .filter-btn');
-    
-    clickables.forEach(element => {
-        // Hover sound (very short tick)
-        element.addEventListener('mouseenter', () => {
-            playSynthBeep(1200, 0.015, 'sine');
-        });
-
-        // Click sound (higher pitch beep)
-        element.addEventListener('click', () => {
-            playSynthBeep(850, 0.06, 'triangle');
-        });
-    });
+/** Escapa texto del visitante antes de meterlo en innerHTML. */
+function esc(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
 }
 
 
 /* ==========================================================================
-   INTERACTIVE CARDS SPOTLIGHT GLOW EFFECT (BENTO CARDS)
+   NAVEGACIÓN
    ========================================================================== */
-const cards = document.querySelectorAll('.service-card');
 
-cards.forEach(card => {
-    card.addEventListener('mousemove', e => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        card.style.setProperty('--mouse-x', `${x}px`);
-        card.style.setProperty('--mouse-y', `${y}px`);
-    });
-});
+function initNav() {
+    const nav = $('#nav');
+    const burger = $('#burger');
+    const drawer = $('#drawer');
 
+    // Fondo de la barra al bajar
+    const onScroll = () => nav.classList.toggle('is-stuck', window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
 
-/* ==========================================================================
-   SCROLL REVEAL INTERSECTION OBSERVER
-   ========================================================================== */
-const scrollElements = document.querySelectorAll('.animate-scroll');
+    // Menú móvil
+    const closeDrawer = () => {
+        nav.classList.remove('is-open');
+        drawer.classList.remove('is-open');
+        burger.setAttribute('aria-expanded', 'false');
+    };
 
-const scrollObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('revealed');
-            
-            // If the revealed element is the skills section, animate skill bars
-            if (entry.target.id === 'skills' || entry.target.contains(document.querySelector('.skill-bar-fill'))) {
-                animateSkillBars();
-            }
-            observer.unobserve(entry.target);
-        }
-    });
-}, {
-    threshold: 0.15,
-    rootMargin: '0px 0px -50px 0px'
-});
-
-scrollElements.forEach(el => scrollObserver.observe(el));
-
-// Function to slide-in skill bars
-function animateSkillBars() {
-    const bars = document.querySelectorAll('.skill-bar-fill');
-    bars.forEach(bar => {
-        // Force rendering width which is defined in style attributes
-        const width = bar.style.width;
-        bar.style.width = '0';
-        setTimeout(() => {
-            bar.style.width = width;
-        }, 100);
-    });
-}
-
-
-/* ==========================================================================
-   PORTFOLIO FILTER LOGIC
-   ========================================================================== */
-const filterButtons = document.querySelectorAll('.filter-btn');
-const projectCards = document.querySelectorAll('.project-card');
-const projectsEmptyState = document.getElementById('projectsEmptyState');
-
-function applyProjectFilter(filter) {
-    let visibleCount = 0;
-
-    projectCards.forEach(card => {
-        const category = card.getAttribute('data-category');
-
-        if (filter === 'all' || category === filter) {
-            visibleCount++;
-            card.style.display = 'block';
-            // Trigger smooth fade-in
-            setTimeout(() => {
-                card.style.opacity = '1';
-                card.style.transform = 'scale(1)';
-            }, 50);
-        } else {
-            card.style.opacity = '0';
-            card.style.transform = 'scale(0.95)';
-            // Delay hiding element to let fade transition finish
-            setTimeout(() => {
-                card.style.display = 'none';
-            }, 300);
-        }
+    burger.addEventListener('click', () => {
+        const open = drawer.classList.toggle('is-open');
+        nav.classList.toggle('is-open', open);
+        burger.setAttribute('aria-expanded', String(open));
     });
 
-    // Show an inviting empty state instead of a blank grid
-    if (projectsEmptyState) {
-        if (visibleCount === 0) {
-            setTimeout(() => { projectsEmptyState.hidden = false; }, 300);
-        } else {
-            projectsEmptyState.hidden = true;
-        }
-    }
-}
+    $$('a', drawer).forEach(a => a.addEventListener('click', closeDrawer));
 
-filterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const filter = button.getAttribute('data-filter');
-
-        // Update active class on buttons
-        filterButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-
-        applyProjectFilter(filter);
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeDrawer();
     });
-});
 
+    // Resaltar el enlace de la sección visible
+    const links = $$('#navLinks a');
+    const sections = links
+        .map(a => $(a.getAttribute('href')))
+        .filter(Boolean);
 
-/* ==========================================================================
-   NAVIGATION RESPONSIVE MENU AND ACTIVE LINK SCROLL HIGHLIGHT
-   ========================================================================== */
-const navbar = document.getElementById('navbar');
-const mobileToggle = document.getElementById('mobileToggle');
-const navMenu = document.getElementById('navMenu');
-const navLinks = document.querySelectorAll('.nav-link');
+    if (!sections.length) return;
 
-// Sticky Navbar scroll trigger
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        navbar.classList.add('scrolled');
-    } else {
-        navbar.classList.remove('scrolled');
-    }
-    
-    highlightActiveLink();
-});
-
-// Mobile menu toggle
-mobileToggle.addEventListener('click', () => {
-    mobileToggle.classList.toggle('active');
-    navMenu.classList.toggle('active');
-});
-
-// Close mobile menu when link is clicked
-navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-        mobileToggle.classList.remove('active');
-        navMenu.classList.remove('active');
-    });
-});
-
-// Highlight menu links on scroll
-const sections = document.querySelectorAll('section');
-function highlightActiveLink() {
-    let scrollPosition = window.scrollY + 200; // Offset
-
-    sections.forEach(section => {
-        const top = section.offsetTop;
-        const height = section.offsetHeight;
-        const id = section.getAttribute('id');
-
-        if (scrollPosition >= top && scrollPosition < top + height) {
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === `#${id}`) {
-                    link.classList.add('active');
-                }
+    const spy = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            links.forEach(a => {
+                a.classList.toggle('is-active', a.getAttribute('href') === `#${entry.target.id}`);
             });
-        }
-    });
+        });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+
+    sections.forEach(s => spy.observe(s));
 }
 
 
 /* ==========================================================================
-   CONTACT FORM - REAL SUBMISSION OVER SECURE CONSOLE UI
-   Los datos se envían de verdad al correo configurado en SITE_CONFIG.
-   La animación de terminal ahora refleja el estado REAL del envío.
+   REVELADO AL HACER SCROLL
    ========================================================================== */
-const contactForm = document.getElementById('contactForm');
-const statusLog = document.getElementById('statusLog');
-const cardButtons = document.querySelectorAll('.btn-service-pill');
-const projectSelect = document.getElementById('projectType');
 
-// If user clicks a "CONSTRUIR LA WEB" or "CREAR MUNDOS" button, auto-select it in form
-cardButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const service = btn.getAttribute('data-service');
-        if (service === 'Páginas Web') projectSelect.value = 'web';
-        if (service === 'Videojuegos') projectSelect.value = 'games';
-        if (service === 'Programas y Aplicaciones') projectSelect.value = 'apps';
-    });
-});
+function initReveal() {
+    const items = $$('.rise');
 
-// Prints one line into the terminal log with the cyberpunk beep
-function printTerminalLine(text, tone = 'info') {
-    const colors = { info: 'var(--color-cyan)', ok: '#22c55e', error: '#ef4444' };
-    const line = document.createElement('span');
-    line.className = 'status-line';
-    line.style.display = 'block';
-    line.style.color = colors[tone] || colors.info;
-    line.innerHTML = text;
-    statusLog.appendChild(line);
-    statusLog.scrollTop = statusLog.scrollHeight;
-
-    const freq = tone === 'error' ? 220 : tone === 'ok' ? 700 : 450;
-    playSynthBeep(freq, 0.04, 'square');
-}
-
-// Small pause so the terminal still feels alive while the request travels
-const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-// Builds the fallback message shown if the network or the config fails
-function buildFallbackContact(name, projectLabel, message) {
-    const options = [];
-    if (SITE_CONFIG.WHATSAPP) {
-        const text = encodeURIComponent(
-            `Hola JPDevSlayer, soy ${name}. Me interesa: ${projectLabel}.\n\n${message}`
-        );
-        options.push(`<a href="https://wa.me/${SITE_CONFIG.WHATSAPP}?text=${text}" target="_blank" rel="noopener" class="status-fallback-link">ESCRIBIR POR WHATSAPP</a>`);
-    }
-    if (SITE_CONFIG.EMAIL_CONTACTO) {
-        const subject = encodeURIComponent(`Proyecto: ${projectLabel} - ${name}`);
-        const body = encodeURIComponent(message);
-        options.push(`<a href="mailto:${SITE_CONFIG.EMAIL_CONTACTO}?subject=${subject}&body=${body}" class="status-fallback-link">ENVIAR POR CORREO</a>`);
-    }
-    return options.length ? `>> CANAL ALTERNO DISPONIBLE: ${options.join(' &nbsp;/&nbsp; ')}` : '';
-}
-
-contactForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const message = document.getElementById('message').value.trim();
-    const honeypot = document.getElementById('company_website');
-
-    // Human-readable label of the selected service
-    const projectLabel = projectSelect.selectedIndex > 0
-        ? projectSelect.options[projectSelect.selectedIndex].text
-        : 'No especificado';
-
-    const submitBtn = contactForm.querySelector('.btn-submit');
-    submitBtn.disabled = true;
-    statusLog.innerHTML = '';
-
-    printTerminalLine('>> INICIANDO PROTOCOLO DE TRANSMISIÓN DE DATOS...');
-    await wait(500);
-
-    // Honeypot: only bots fill this hidden field. Fake success, send nothing.
-    if (honeypot && honeypot.value) {
-        printTerminalLine('>> TRANSFERENCIA COMPLETADA.', 'ok');
-        submitBtn.disabled = false;
-        contactForm.reset();
+    if (reduceMotion) {
+        items.forEach(el => el.classList.add('is-in'));
+        $('#heroTitle')?.classList.add('is-lit');
         return;
     }
 
-    printTerminalLine(`>> ENCRIPTANDO MENSAJE DE [${name.toUpperCase()}]...`);
-    await wait(450);
-    printTerminalLine('>> CONECTANDO CON EL SERVIDOR JPDevSlayer...');
-
-    try {
-        if (!SITE_CONFIG.FORMSPREE_ID || SITE_CONFIG.FORMSPREE_ID.includes('PEGA-AQUI')) {
-            throw new Error('SIN_CONFIGURAR');
-        }
-
-        const response = await fetch(`https://formspree.io/f/${SITE_CONFIG.FORMSPREE_ID}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({
-                _subject: `Nuevo proyecto (${projectLabel}) - ${name}`,
-                name: name,
-                email: email,
-                tipo_de_proyecto: projectLabel,
-                message: message,
-                origen: 'jpdevslayer.com'
-            })
+    const io = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-in');
+            obs.unobserve(entry.target);
         });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
-        if (!response.ok) {
-            const result = await response.json().catch(() => ({}));
-            const detail = (result.errors || []).map(err => err.message).join(', ');
-            throw new Error(detail || `ERROR_${response.status}`);
-        }
+    items.forEach(el => io.observe(el));
 
-        printTerminalLine(`>> MENSAJE ENTREGADO. CANAL DE RESPUESTA: ${email.toLowerCase()}`, 'ok');
-        await wait(400);
-        printTerminalLine('>> MISIÓN REGISTRADA. TE RESPONDEREMOS EN MENOS DE 24 HORAS.', 'ok');
+    // El titular del hero se revela al cargar, no al hacer scroll
+    requestAnimationFrame(() => {
+        setTimeout(() => $('#heroTitle')?.classList.add('is-lit'), 120);
+    });
+}
 
-        contactForm.reset();
-        setTimeout(() => {
-            statusLog.innerHTML = '<span class="status-line">>> Canal listo para nueva transmisión. Esperando operador...</span>';
-        }, 10000);
-
-    } catch (error) {
-        const reason = error.message === 'SIN_CONFIGURAR'
-            ? '>> ERROR: CANAL PRINCIPAL NO CONFIGURADO.'
-            : '>> ERROR: NO SE PUDO ESTABLECER LA CONEXIÓN.';
-
-        printTerminalLine(reason, 'error');
-        const fallback = buildFallbackContact(name, projectLabel, message);
-        if (fallback) {
-            printTerminalLine(fallback, 'error');
-        } else {
-            printTerminalLine('>> INTENTA DE NUEVO EN UNOS MINUTOS.', 'error');
-        }
-        console.error('[Formulario de contacto]', error);
-    } finally {
-        submitBtn.disabled = false;
-    }
-});
 
 /* ==========================================================================
-   PROJECT DETAILS MODAL & INTERACTIVE CAROUSEL SYSTEM
+   CONTADORES DEL HERO
    ========================================================================== */
 
-const projectData = {
+function initCounters() {
+    const targets = $$('[data-count]');
+    if (!targets.length || reduceMotion) return;
+
+    const io = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+
+            const el = entry.target;
+            const end = Number(el.dataset.count);
+            const duration = 900;
+            const start = performance.now();
+
+            const tick = now => {
+                const p = Math.min((now - start) / duration, 1);
+                // Desaceleración suave
+                el.textContent = Math.round(end * (1 - Math.pow(1 - p, 3)));
+                if (p < 1) requestAnimationFrame(tick);
+            };
+
+            requestAnimationFrame(tick);
+            obs.unobserve(el);
+        });
+    }, { threshold: 0.6 });
+
+    targets.forEach(el => io.observe(el));
+}
+
+
+/* ==========================================================================
+   MARQUESINA — se duplica para que el bucle no tenga costura
+   ========================================================================== */
+
+function initStrip() {
+    const track = $('#stripTrack');
+    if (!track) return;
+    track.innerHTML += track.innerHTML;
+}
+
+
+/* ==========================================================================
+   FILTROS DE TRABAJOS
+   ========================================================================== */
+
+function initFilters() {
+    const chips = $$('.chip');
+    const cards = $$('.work-card');
+    const empty = $('#empty');
+
+    chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            const filter = chip.dataset.filter;
+
+            chips.forEach(c => c.classList.remove('is-on'));
+            chip.classList.add('is-on');
+
+            let shown = 0;
+
+            cards.forEach(card => {
+                const match = filter === 'all' || card.dataset.category === filter;
+                card.hidden = !match;
+                if (match) shown++;
+            });
+
+            // Un hueco en blanco parece un error; esto invita a escribir
+            if (empty) empty.hidden = shown > 0;
+        });
+    });
+}
+
+
+/* ==========================================================================
+   DATOS DE LOS PROYECTOS
+   Cada clave debe coincidir con un data-project="..." de index.html
+   ========================================================================== */
+
+const PROYECTOS = {
+    olimpo: {
+        title: 'Olimpo',
+        subtitle: 'Plataforma para entrenadores personales',
+        estado: 'construccion',
+        resumen: 'El gimnasio entero de un entrenador dentro del teléfono de sus clientes. El entrenador arma rutinas y dietas y se las asigna; el cliente entra desde su celular, ve lo que le toca hoy, marca lo que hizo, sube sus fotos de progreso y paga su plan. Funciona como página web y como aplicación de Android y iPhone.',
+        specs: {
+            'Sector': 'Fitness y entrenamiento',
+            'Estado': 'En construcción',
+            'Plataformas': 'Web · Android · iPhone',
+            'Roles': 'Administrador · Entrenador · Cliente'
+        },
+        features: [
+            '<strong>Rutinas por día:</strong> catálogo de más de 1.300 ejercicios con series, repeticiones, peso y descanso. Todo editable por el entrenador.',
+            '<strong>Dietas con calorías:</strong> plan de comidas por día, cada alimento con sus macros, y barras de cuánto lleva cumplido el cliente.',
+            '<strong>Progreso con fotos:</strong> peso, siete medidas corporales y fotos de frente, perfil y espalda, con gráfico de evolución. Las fotos solo las ve el entrenador si el cliente lo autoriza.',
+            '<strong>Cobro de cuotas:</strong> el cliente sube el comprobante, queda en revisión y el entrenador lo aprueba o lo rechaza.',
+            '<strong>Chat en vivo:</strong> canal de comunidad para todos y conversación privada con el entrenador según el rango del cliente.',
+            '<strong>Rangos de cliente:</strong> Bronce, Plata, Oro y Elite, cada uno con permisos distintos.'
+        ],
+        tech: ['Next.js', 'React', 'TypeScript', 'PostgreSQL', 'Aplicación instalable', 'Notificaciones push', 'Android', 'iOS'],
+        images: [
+            { src: 'assets/olimpo_1.png', caption: 'La rutina del día, tal como la ve el cliente en su teléfono.' },
+            { src: 'assets/olimpo_2.png', caption: 'Los módulos: rutinas, dietas con calorías, progreso con fotos, cobro de cuotas, chat y tablón de avisos.' },
+            { src: 'assets/olimpo_3.png', caption: 'El mismo sistema visto desde los dos lados: el entrenador desde el ordenador, el cliente desde el móvil.' },
+            { src: 'assets/olimpo_4.png', caption: 'Qué viene funcionando desde el primer día y qué se adapta a la forma de trabajar de cada gimnasio.' },
+            { src: 'assets/olimpo_5.png', caption: 'Las decisiones pequeñas: fotos privadas, precio congelado, retiro sin borrar el pasado.' }
+        ]
+    },
+
     sigma: {
-        title: "SIGMA MATH PORTAL",
-        subtitle: "Sistema Web de Gestión y Finanzas",
-        meta: "DESARROLLO WEB // BASE DE DATOS // ENCRIPTACIÓN",
-        stats: {
-            "Cliente": "Prof. Diana Matson",
-            "Estado": "<span class='status-pill'><span class='dot'></span> COMPLETADO & PAGADO</span>",
-            "Base de Datos": "Supabase (PostgreSQL)",
-            "Autenticación": "Supabase Auth"
+        title: 'Sigmat',
+        subtitle: 'Portal académico y de cobros',
+        resumen: 'Portal a medida para clases particulares de matemática. La profesora registra alumnos, toma asistencia, carga calificaciones y verifica los pagos mensuales. Cada estudiante entra con su propio usuario y ve únicamente su información.',
+        specs: {
+            'Sector': 'Educación',
+            'Estado': 'Entregado',
+            'Base de datos': 'Supabase (PostgreSQL)',
+            'Seguridad': 'Supabase Auth + RLS'
         },
-        description: "Un portal académico y administrativo diseñado a medida para simplificar y automatizar el control de alumnos, asistencia, calificaciones y registro de pagos mensuales de clases particulares. La aplicación cuenta con un doble acceso de roles (profesora y alumnos) y está conectada en tiempo real a una base de datos segura.",
         features: [
-            "<strong>Doble Interfaz Adaptativa:</strong> Panel privado para la profesora (gestión académica/financiera) y portal para estudiantes (notas, asistencia y pagos).",
-            "<strong>Control de Asistencia Diario:</strong> Grid interactivo que calcula automáticamente el porcentaje global de asistencia de cada estudiante.",
-            "<strong>Carga de Recibos Drag-and-Drop:</strong> Módulo interactivo de carga de archivos multimedia para comprobar pagos.",
-            "<strong>Dashboard Financiero Avanzado:</strong> Panel administrativo con métricas, gráficos de líneas SVG para ingresos a lo largo del tiempo y gráfico de dona de distribución.",
-            "<strong>Seguridad con Row Level Security (RLS):</strong> Políticas en PostgreSQL que aseguran que los estudiantes solo accedan a sus propios datos."
+            '<strong>Dos portales en uno:</strong> panel privado para la profesora con la gestión académica y financiera, y portal para estudiantes con sus notas, asistencia y pagos.',
+            '<strong>Asistencia diaria:</strong> cuadrícula interactiva que calcula sola el porcentaje de asistencia de cada estudiante a lo largo del período.',
+            '<strong>Comprobantes de pago:</strong> el alumno sube la foto del pago arrastrándola, y la profesora la verifica desde su panel.',
+            '<strong>Panel financiero:</strong> ingresos en el tiempo, distribución de cobros y control de quién está al día.',
+            '<strong>Seguridad en la base de datos:</strong> políticas Row Level Security que impiden que un estudiante vea los datos de otro, aunque manipule el navegador.'
         ],
-        tech: ["HTML5", "CSS3 Moderno", "JavaScript ES6", "Supabase Auth", "PostgreSQL DB", "RLS Security", "Vercel Deploy"],
+        tech: ['JavaScript ES6', 'CSS moderno', 'Supabase Auth', 'PostgreSQL', 'Row Level Security', 'Vercel'],
         images: [
-            { src: "assets/math_1.png", caption: "Portal de acceso seguro (Login) con credenciales y accesos demo rápidos." },
-            { src: "assets/math_2.png", caption: "Módulo de gestión académica: registro de nuevos alumnos y asignación de calificaciones." },
-            { src: "assets/math_3.png", caption: "Dashboard financiero: métricas en tiempo real, gráfico de ingresos y distribución de cobros." },
-            { src: "assets/math_4.png", caption: "Panel de auditoría: tabla de control de pagos y verificación manual de recibos." }
+            { src: 'assets/math_3.png', caption: 'Panel financiero: ingresos, distribución de cobros y métricas.' },
+            { src: 'assets/math_1.png', caption: 'Acceso seguro con usuario y contraseña.' },
+            { src: 'assets/math_2.png', caption: 'Gestión académica: alumnos y calificaciones.' },
+            { src: 'assets/math_4.png', caption: 'Control de pagos y verificación de comprobantes.' }
         ]
     },
-    bodega3: {
-        title: "BODEGA-3 SISTEMA ADMINISTRATIVO",
-        subtitle: "Plataforma de Gestión Comercial Multi-Usuario",
-        meta: "REACT // SUPABASE // TYPESCRIPT // VERCEL",
-        stats: {
-            "Cliente": "Bodega 3 (Venezuela)",
-            "Estado": "<span class='status-pill'><span class='dot green'></span> PRODUCCIÓN</span>",
-            "Base de Datos": "Supabase (PostgreSQL + RLS)",
-            "Autenticación": "Supabase Auth (multi-rol)"
+
+    fastchat: {
+        title: 'FastChatCenter',
+        subtitle: 'Central de atención multicanal',
+        resumen: 'Todas las conversaciones de un negocio en una sola bandeja: WhatsApp, Messenger e Instagram juntos, atendidos por varios agentes a la vez sin pisarse. Cada mensaje se convierte en un ticket que se asigna, se responde y se cierra, con historial completo por contacto.',
+        specs: {
+            'Sector': 'Atención al cliente',
+            'Estado': 'En producción',
+            'Canales': 'WhatsApp · Messenger · Instagram',
+            'Base de datos': 'MySQL / MariaDB'
         },
-        description: "Aplicación web full-stack diseñada para digitalizar la operación completa de una bodega en Venezuela. Maneja inventario con 478 productos, registro de ventas, compras, cuentas por cobrar/pagar y dashboard analítico en tiempo real. Sistema multi-usuario con roles (admin/empleado) protegido con Row Level Security, conversión automática USD$/Bs con tasa BCV del día, e importación masiva de ventas del cuaderno desde Excel (validación contra stock y catálogo).",
         features: [
-            "<strong>Inventario Inteligente:</strong> 478 productos categorizados con stock actual, valorizado a costo/venta, clasificación por rotación (cuartiles sobre 30 días) y alertas de stock bajo/crítico.",
-            "<strong>Importación Masiva desde Excel:</strong> Carga las ventas del día subiendo una plantilla .xlsx. El sistema valida cada fila contra el catálogo y el stock disponible, muestra advertencias en vivo y crea la venta con descuento automático de inventario vía triggers de PostgreSQL.",
-            "<strong>Multi-moneda con Tasa BCV:</strong> Todos los precios en USD$ con conversión automática a Bolívares usando la tasa oficial del día (editable desde el topbar, cacheada por fecha).",
-            "<strong>Dashboard Analítico:</strong> Resumen día/semana/mes con ventas, compras, utilidad bruta, ticket promedio, top 5 productos vendidos, alertas de stock bajo y gráfico de área ventas vs compras.",
-            "<strong>Multi-rol con RLS:</strong> Vendedores (empleado) cargan ventas, administradora (admin) revisa y aprueba, owner (admin) tiene acceso total. Row Level Security en PostgreSQL garantiza que cada usuario solo acceda a lo permitido.",
-            "<strong>UI Cyberpunk Responsive:</strong> Tema neón con paleta cian/magenta/verde, tipografía Orbitron + JetBrains Mono + Inter, animaciones fluidas, sidebar con menú hamburguesa móvil."
+            '<strong>Bandeja compartida:</strong> los chats se organizan en pendientes, abiertos y resueltos. Un agente acepta un ticket y queda asignado a él, para que dos personas no respondan lo mismo.',
+            '<strong>Varias empresas en un sistema:</strong> cada negocio tiene su espacio aislado, con su marca, sus usuarios y sus datos separados.',
+            '<strong>Chatbots por departamento:</strong> flujos automáticos que atienden y derivan al área correcta antes de que intervenga una persona.',
+            '<strong>Respuestas rápidas y campañas:</strong> plantillas para lo que se pregunta siempre, y envíos programados a listas de contactos.',
+            '<strong>Informes de atención:</strong> tiempo promedio de primera respuesta, de resolución y rendimiento por agente.',
+            '<strong>Alarmas:</strong> avisos cuando un chat lleva demasiado tiempo sin respuesta.'
         ],
-        tech: ["React 18", "Vite", "TypeScript", "Tailwind CSS", "Supabase (PostgreSQL)", "Supabase Auth", "Row Level Security", "PostgreSQL Triggers", "SheetJS (xlsx)", "Lucide Icons", "Vercel Deploy"],
+        tech: ['React', 'TypeScript', 'Vite', 'Node.js', 'Sequelize', 'MySQL', 'WebSockets', 'API de Meta', 'Docker'],
         images: [
-            { src: "assets/bodega_1.png", caption: "Dashboard principal: ventas del día ($101.21), top productos, gráfico ventas vs compras y alertas de stock." },
-            { src: "assets/bodega_3_inventario.png", caption: "Módulo de Inventario: 478 productos, valorizado a costo y venta, alertas de stock bajo y sin stock, filtros por rotación." },
-            { src: "assets/bodega_4_productos.png", caption: "Catálogo de Productos: tabla con código, nombre, categoría, costo, venta, margen y stock de los 478 productos." },
-            { src: "assets/bodega_5_ventas.png", caption: "Módulo de Ventas: registro de ventas con cliente, forma de pago, totales en USD$ y Bolívares, estado pagado." },
-            { src: "assets/bodega_6_importar.png", caption: "Importar Ventas: carga masiva desde Excel con drag&drop, descarga de plantilla con catálogo embebido." },
-            { src: "assets/bodega_2.png", caption: "Pantalla de login cyberpunk con branding BODEGA-3 y acceso seguro multi-rol." }
+            { src: 'assets/fastchat_1.png', caption: 'Bandeja compartida: pendientes, abiertos y resueltos. Un agente acepta el ticket y queda asignado a él.' },
+            { src: 'assets/fastchat_2.png', caption: 'Conexiones: WhatsApp e Instagram enlazados al mismo panel, cada uno con su estado.' },
+            { src: 'assets/fastchat_3.png', caption: 'Departamentos y chatbots que atienden y derivan al área correcta antes de que entre una persona.' },
+            { src: 'assets/fastchat_4.png', caption: 'Respuestas rápidas: plantillas con atajo para lo que se pregunta siempre.' },
+            { src: 'assets/fastchat_5.png', caption: 'Campañas: envíos programados a listas de contactos, con su progreso y estado.' },
+            { src: 'assets/fastchat_6.png', caption: 'Etiquetas con color para clasificar contactos y conversaciones.' },
+            { src: 'assets/fastchat_7.png', caption: 'Equipo: usuarios, perfiles y control de quién está en línea.' }
         ]
     },
-    nexus: {
-        title: "NEXUS MOTOR ANALÍTICO",
-        subtitle: "Sistema Inteligente de Asistencia",
-        meta: "REACT // TAILWIND // VITE",
-        stats: {
-            "Cliente": "Saman y Orinokia",
-            "Estado": "<span class='status-pill'><span class='dot green'></span> PRODUCCIÓN</span>",
-            "Procesamiento": "XLSX Parsing Avanzado",
-            "Base de Datos": "Browser LocalStorage"
+
+    asistencia: {
+        title: 'Asistencia',
+        subtitle: 'Motor de análisis de personal',
+        resumen: 'Toma los reportes en bruto del reloj biométrico y los convierte en información útil. Agrupa las marcaciones de cada persona por día, deduce la entrada y la salida, las compara contra el horario asignado con su tolerancia, y saca las alertas de tardanza e inasistencia sin revisión manual.',
+        specs: {
+            'Sector': 'Recursos humanos',
+            'Estado': 'En producción',
+            'Entrada': 'Excel de Hik-Connect',
+            'Procesamiento': 'En el navegador'
         },
-        description: "Una aplicación web de alto rendimiento diseñada para procesar reportes biométricos generados por Hik-Connect. Transforma datos crudos de Excel en un panel analítico futurista que calcula retardo, puntualidad y detecta de forma inteligente omisiones de marcaje (entradas y salidas).",
         features: [
-            "<strong>Algoritmo de Agrupación (Punch-Pairing):</strong> El sistema detecta inteligentemente si los empleados marcaron una o varias veces al día y agrupa los tiempos de entrada/salida automáticamente.",
-            "<strong>Dashboard Global:</strong> Panel superior interactivo que muestra las métricas de toda la compañía o de grupos específicos en tiempo real.",
-            "<strong>Diseño Futurista (Glassmorphism):</strong> Interfaz moderna con paneles semitransparentes, desenfoques de cristal y acentos de neón.",
-            "<strong>Omitir Empleados:</strong> Capacidad de filtrar directivos o personal que no requiere marcaje desde la pantalla de configuración."
+            '<strong>Lee el Excel del reloj tal como sale:</strong> salta los títulos gigantes del reporte y encuentra solo las columnas que importan.',
+            '<strong>Agrupa las marcaciones:</strong> el reloj exporta una fila por cada huella. El sistema junta todas las de una persona en un día y define la hora menor como entrada y la mayor como salida.',
+            '<strong>Cálculo de retardos:</strong> compara la entrada contra la hora oficial más la tolerancia que configures.',
+            '<strong>Separación por grupos:</strong> maneja varias sedes o equipos por separado dentro del mismo reporte.',
+            '<strong>Exporta el resultado:</strong> genera un Excel nuevo, ya procesado y listo para usar.'
         ],
-        tech: ["React.js", "Vite", "Tailwind CSS", "SheetJS (XLSX)", "Lucide Icons", "Vercel Deploy"],
+        tech: ['React', 'Vite', 'SheetJS (xlsx)', 'Tailwind CSS', 'Lucide'],
         images: [
-            { src: "assets/nexus_1.gif", caption: "Pantalla inicial de NEXUS: Carga de reportes biométricos." },
-            { src: "assets/nexus_2.gif", caption: "Dashboard Global: Métricas en tiempo real y tarjetas de asistencia con alertas." },
-            { src: "assets/nexus_3.gif", caption: "Configuración Avanzada: Mapeo de columnas, tolerancia de horarios y omisión de empleados." },
-            { src: "assets/web_sphere.jpg", caption: "Diseño futurista basado en Glassmorphism." }
+            { src: 'assets/nexus_2.gif', caption: 'Panel global con métricas y alertas de asistencia.' },
+            { src: 'assets/nexus_1.gif', caption: 'Carga de los reportes del reloj biométrico.' },
+            { src: 'assets/nexus_3.gif', caption: 'Configuración: mapeo de columnas y tolerancia de horarios.' },
+            { src: 'assets/asistencia_1.png', caption: 'Punto de entrada: se arrastra el reporte de Hik-Connect y el motor hace el resto.' }
         ]
     }
 };
 
-function initProjectModal() {
-    const modal = document.getElementById('projectModal');
-    const backdrop = document.getElementById('modalBackdrop');
-    const closeBtn = document.getElementById('modalCloseBtn');
-    const modalBody = document.getElementById('modalBody');
-    const modalTitle = document.getElementById('modalTitle');
-    const cards = document.querySelectorAll('.project-card');
 
-    if (!modal || !cards.length) return;
+/* ==========================================================================
+   MODAL DE PROYECTO
+   ========================================================================== */
 
-    cards.forEach(card => {
-        card.addEventListener('click', () => {
-            const projectId = card.getAttribute('data-project-id');
-            const data = projectData[projectId];
-            
-            if (data) {
-                // Populate Modal Data
-                modalTitle.textContent = data.title;
-                
-                // Build Modal content
-                let imagesHTML = '';
-                let indicatorsHTML = '';
-                
-                data.images.forEach((img, index) => {
-                    imagesHTML += `
-                        <div class="carousel-slide">
-                            <img src="${img.src}" alt="${img.caption || data.title}">
-                            <div class="carousel-caption">
-                                <span>${img.caption || ''}</span>
-                                <span class="carousel-counter">${index + 1} / ${data.images.length}</span>
-                            </div>
-                        </div>
-                    `;
-                    indicatorsHTML += `
-                        <button class="carousel-dot ${index === 0 ? 'active' : ''}" data-slide="${index}" aria-label="Ir a diapositiva ${index + 1}"></button>
-                    `;
-                });
+function initModal() {
+    const modal = $('#modal');
+    const veil = $('#modalVeil');
+    const closeBtn = $('#modalX');
+    const titleEl = $('#modalTitle');
+    const bodyEl = $('#modalBody');
+    let lastFocused = null;
 
-                let statsHTML = '';
-                for (const [key, value] of Object.entries(data.stats)) {
-                    statsHTML += `
-                        <div class="meta-item">
-                            <span class="meta-label">${key}</span>
-                            <span class="meta-value">${value}</span>
-                        </div>
-                    `;
-                }
+    function render(key) {
+        const p = PROYECTOS[key];
+        if (!p) {
+            console.error(`[Modal] No hay datos para "${key}". Revisa PROYECTOS en script.js.`);
+            return false;
+        }
 
-                let featuresHTML = '';
-                data.features.forEach(f => {
-                    featuresHTML += `
-                        <li class="feature-list-item">
-                            <span class="feature-bullet">»</span>
-                            <span class="feature-text">${f}</span>
-                        </li>
-                    `;
-                });
+        titleEl.textContent = p.title;
 
-                let techHTML = '';
-                data.tech.forEach(t => {
-                    techHTML += `<span class="tech-badge">${t}</span>`;
-                });
+        const specs = Object.entries(p.specs)
+            .map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`)
+            .join('');
 
-                modalBody.innerHTML = `
-                    <div class="modal-layout-grid">
-                        <div class="modal-visual-area">
-                            <div class="modal-carousel" id="modalCarousel">
-                                <div class="carousel-view">
-                                    <div class="carousel-track" id="carouselTrack" style="transform: translateX(0%);">
-                                        ${imagesHTML}
-                                    </div>
-                                    ${data.images.length > 1 ? `
-                                        <button class="carousel-btn prev" id="carouselPrevBtn" aria-label="Anterior">&lsaquo;</button>
-                                        <button class="carousel-btn next" id="carouselNextBtn" aria-label="Siguiente">&rsaquo;</button>
-                                    ` : ''}
-                                </div>
-                            </div>
-                            ${data.images.length > 1 ? `
-                                <div class="carousel-indicators" id="carouselIndicators">
-                                    ${indicatorsHTML}
-                                </div>
-                            ` : ''}
-                        </div>
-                        <div class="modal-details-area">
-                            <div>
-                                <span class="modal-subtitle">${data.meta}</span>
-                                <h4 style="font-family: var(--font-display); font-size: 1.1rem; color: white; margin-bottom: 1rem;">${data.subtitle}</h4>
-                                <p class="modal-description">${data.description}</p>
-                            </div>
-                            
-                            <div>
-                                <h5 class="modal-section-title">Detalles del Sistema</h5>
-                                <div class="modal-meta-grid">
-                                    ${statsHTML}
-                                </div>
-                            </div>
+        const thumbs = p.images
+            .map((img, i) => `
+                <button type="button" data-i="${i}" class="${i === 0 ? 'is-on' : ''}" aria-label="Captura ${i + 1}">
+                    <img src="${img.src}" alt="" loading="lazy">
+                </button>`)
+            .join('');
 
-                            <div>
-                                <h5 class="modal-section-title">Características Clave</h5>
-                                <ul class="features-list">
-                                    ${featuresHTML}
-                                </ul>
-                            </div>
+        bodyEl.innerHTML = `
+            <div class="shots">
+                <figure class="shot-main" style="margin:0">
+                    <img id="shotImg" src="${p.images[0].src}" alt="${p.title}">
+                    <figcaption class="shot-cap" id="shotCap">${p.images[0].caption}</figcaption>
+                </figure>
+                ${p.images.length > 1 ? `<div class="shot-strip" id="shotStrip">${thumbs}</div>` : ''}
+            </div>
 
-                            <div>
-                                <h5 class="modal-section-title">Pila Tecnológica</h5>
-                                <div class="tech-badges-container">
-                                    ${techHTML}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
+            <div class="modal-cols">
+                <div>
+                    <h4>${p.subtitle}</h4>
+                    <p>${p.resumen}</p>
+                    <h4>Qué resuelve</h4>
+                    <ul class="feat">${p.features.map(f => `<li>${f}</li>`).join('')}</ul>
+                </div>
+                <div>
+                    <h4>Ficha</h4>
+                    <dl class="spec">${specs}</dl>
+                    <h4>Construido con</h4>
+                    <div class="work-tech">${p.tech.map(t => `<span>${t}</span>`).join('')}</div>
+                </div>
+            </div>`;
 
-                // Open Modal
-                modal.classList.add('active');
-                document.body.style.overflow = 'hidden'; // Lock background scrolling
-                
-                // Add sound effects to new buttons in modal
-                if (typeof attachSoundEffects === 'function') {
-                    attachSoundEffects();
-                }
+        // Carrusel
+        const strip = $('#shotStrip', bodyEl);
+        if (strip) {
+            strip.addEventListener('click', e => {
+                const btn = e.target.closest('button[data-i]');
+                if (!btn) return;
+                const img = p.images[Number(btn.dataset.i)];
+                $('#shotImg', bodyEl).src = img.src;
+                $('#shotCap', bodyEl).textContent = img.caption;
+                $$('button', strip).forEach(b => b.classList.toggle('is-on', b === btn));
+            });
+        }
 
-                // Initialize Carousel functionality
-                if (data.images.length > 1) {
-                    setupCarousel();
-                }
+        return true;
+    }
+
+    function open(key, trigger) {
+        if (!render(key)) return;
+        lastFocused = trigger || document.activeElement;
+        modal.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+        closeBtn.focus();
+    }
+
+    function close() {
+        modal.classList.remove('is-open');
+        document.body.style.overflow = '';
+        lastFocused?.focus();
+    }
+
+    $$('.work-card').forEach(card => {
+        const fire = () => open(card.dataset.project, card);
+        card.addEventListener('click', fire);
+        card.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fire();
             }
         });
     });
 
-    function setupCarousel() {
-        const track = document.getElementById('carouselTrack');
-        const prevBtn = document.getElementById('carouselPrevBtn');
-        const nextBtn = document.getElementById('carouselNextBtn');
-        const dots = document.querySelectorAll('.carousel-dot');
-        let currentIndex = 0;
-        const totalSlides = dots.length;
+    closeBtn.addEventListener('click', close);
+    veil.addEventListener('click', close);
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
+    });
+}
 
-        function updateCarousel(index) {
-            currentIndex = index;
-            // Move track
-            track.style.transform = `translateX(-${currentIndex * 100}%)`;
-            // Update dots
-            dots.forEach(dot => dot.classList.remove('active'));
-            dots[currentIndex].classList.add('active');
-        }
 
-        if (prevBtn && nextBtn) {
-            prevBtn.addEventListener('click', () => {
-                let index = currentIndex - 1;
-                if (index < 0) index = totalSlides - 1; // loop to end
-                updateCarousel(index);
-            });
+/* ==========================================================================
+   WHATSAPP
+   ========================================================================== */
 
-            nextBtn.addEventListener('click', () => {
-                let index = currentIndex + 1;
-                if (index >= totalSlides) index = 0; // loop to start
-                updateCarousel(index);
-            });
-        }
+function waNumber() {
+    return (SITE_CONFIG.WHATSAPP || '').replace(/\D/g, '');
+}
 
-        dots.forEach(dot => {
-            dot.addEventListener('click', () => {
-                const index = parseInt(dot.getAttribute('data-slide'));
-                updateCarousel(index);
-            });
+function waLink(texto) {
+    const n = waNumber();
+    return n ? `https://wa.me/${n}?text=${encodeURIComponent(texto)}` : '';
+}
+
+function initWhatsapp() {
+    const n = waNumber();
+    if (!n) return;
+
+    const saludo = 'Hola JPDevSlayer, vi tu página y me interesa que desarrolles un proyecto.';
+
+    const fab = $('#wa');
+    if (fab) {
+        fab.href = waLink(saludo);
+        fab.hidden = false;
+    }
+
+    const direct = $('#waDirect');
+    if (direct) {
+        direct.href = waLink(saludo);
+        direct.hidden = false;
+        // +58 424 1237997
+        const pretty = `+${n.slice(0, 2)} ${n.slice(2, 5)} ${n.slice(5)}`;
+        $('#waNumber').textContent = pretty;
+    }
+}
+
+
+/* ==========================================================================
+   FORMULARIO DE CONTACTO — envío real
+   ========================================================================== */
+
+function initForm() {
+    const form = $('#form');
+    const status = $('#status');
+    const select = $('#servicio');
+
+    // Los botones "Cotizar" preseleccionan el servicio
+    $$('[data-servicio]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            select.value = btn.dataset.servicio;
         });
+    });
+
+    const say = (html, tone = '') => {
+        const line = document.createElement('span');
+        if (tone) line.className = tone;
+        line.innerHTML = html;
+        status.appendChild(line);
+    };
+
+    function fallback(nombre, servicio, detalle) {
+        const salidas = [];
+        const n = waNumber();
+
+        if (n) {
+            const texto = `Hola JPDevSlayer, soy ${nombre}. Me interesa: ${servicio}.\n\n${detalle}`;
+            salidas.push(`<a href="${waLink(texto)}" target="_blank" rel="noopener">Escríbeme por WhatsApp</a>`);
+        }
+
+        if (SITE_CONFIG.EMAIL_CONTACTO) {
+            const asunto = encodeURIComponent(`${servicio} — ${nombre}`);
+            const cuerpo = encodeURIComponent(detalle);
+            salidas.push(`<a href="mailto:${SITE_CONFIG.EMAIL_CONTACTO}?subject=${asunto}&body=${cuerpo}">Envíamelo por correo</a>`);
+        }
+
+        return salidas.join(' · ');
     }
 
-    function closeModal() {
-        modal.classList.remove('active');
-        document.body.style.overflow = ''; // Unlock scrolling
-    }
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
 
-    // Close events
-    closeBtn.addEventListener('click', closeModal);
-    backdrop.addEventListener('click', closeModal);
-    
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.classList.contains('active')) {
-            closeModal();
+        const nombre = $('#nombre').value.trim();
+        const correo = $('#correo').value.trim();
+        const detalle = $('#detalle').value.trim();
+        const trampa = $('#empresa_web');
+
+        const servicio = select.selectedIndex > 0
+            ? select.options[select.selectedIndex].text
+            : 'Sin especificar';
+
+        const btn = form.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        status.innerHTML = '';
+
+        // Trampa anti-spam: solo los bots rellenan este campo
+        if (trampa && trampa.value) {
+            say('Mensaje enviado.', 'ok');
+            form.reset();
+            btn.disabled = false;
+            return;
+        }
+
+        say('Enviando…');
+
+        try {
+            if (!SITE_CONFIG.FORMSPREE_ID || SITE_CONFIG.FORMSPREE_ID.includes('PEGA-AQUI')) {
+                throw new Error('SIN_CONFIGURAR');
+            }
+
+            const res = await fetch(`https://formspree.io/f/${SITE_CONFIG.FORMSPREE_ID}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    _subject: `${servicio} — ${nombre}`,
+                    nombre,
+                    email: correo,
+                    servicio,
+                    mensaje: detalle,
+                    origen: 'jpdevslayer.com'
+                })
+            });
+
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                const detalleError = (data.errors || []).map(x => x.message).join(', ');
+                throw new Error(detalleError || `ERROR_${res.status}`);
+            }
+
+            status.innerHTML = '';
+            say(`Mensaje recibido, ${esc(nombre)}.`, 'ok');
+            say(`Te respondo a ${esc(correo)} en menos de 24 horas.`, 'ok');
+            form.reset();
+
+        } catch (err) {
+            status.innerHTML = '';
+
+            const salidas = fallback(nombre, servicio, detalle);
+
+            if (err.message === 'SIN_CONFIGURAR') {
+                say('El envío por correo todavía no está activo.', 'bad');
+            } else {
+                say('No se pudo enviar el mensaje.', 'bad');
+            }
+
+            say(salidas || 'Vuelve a intentarlo en unos minutos.', salidas ? '' : 'bad');
+            console.error('[Formulario]', err);
+
+        } finally {
+            btn.disabled = false;
         }
     });
 }
 
 
 /* ==========================================================================
-   FLOATING WHATSAPP CHANNEL
-   Solo aparece si cargaste un número en SITE_CONFIG.WHATSAPP
+   MOTOR DE SCROLL
+   Un solo bucle de animación alimenta todas las piezas movidas por scroll.
+   Nada de un listener por efecto: eso es lo que hace que una página se
+   sienta pesada.
    ========================================================================== */
-function initWhatsappFab() {
-    const fab = document.getElementById('whatsappFab');
-    if (!fab) return;
 
-    const numero = (SITE_CONFIG.WHATSAPP || '').replace(/\D/g, '');
-    if (!numero) return;
+const scrollFx = [];
+let ticking = false;
 
-    const saludo = encodeURIComponent(
-        'Hola JPDevSlayer, vi tu portafolio y me interesa que desarrolles un proyecto.'
-    );
-    fab.href = `https://wa.me/${numero}?text=${saludo}`;
-    fab.hidden = false;
+function onScrollFrame() {
+    for (const fn of scrollFx) fn();
+    ticking = false;
 }
 
-// Initialization
+function pedirCuadro() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(onScrollFrame);
+}
+
+window.addEventListener('scroll', pedirCuadro, { passive: true });
+window.addEventListener('resize', pedirCuadro, { passive: true });
+
+/** Interpola suavemente hacia el destino. */
+const lerp = (a, b, t) => a + (b - a) * t;
+
+/** Recorta un valor al rango 0-1. */
+const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+
+/** Curva suave de entrada y salida. */
+const suave = t => t * t * (3 - 2 * t);
+
+
+/* ==========================================================================
+   EL SELLO — el logo viaja del hero a la barra
+   Es la pieza firma: resuelve que el logo sea protagonista y que haya
+   movimiento real, con una sola animación.
+   ========================================================================== */
+
+function initSigil() {
+    const sigil = document.getElementById('sigil');
+    const slot = document.getElementById('brandSlot');
+    const hero = document.getElementById('top');
+    if (!sigil || !slot || !hero) return;
+
+    // Posición actual suavizada, para que no vaya pegado al scroll
+    let ax = 0, ay = 0, as = 1, listo = false;
+
+    function medir() {
+        const vw = window.innerWidth;
+        const grande = vw < 760 ? 190 : vw < 1080 ? 250 : 340;
+        sigil.style.setProperty('--sigil-size', grande + 'px');
+        return grande;
+    }
+
+    let tam = medir();
+    window.addEventListener('resize', () => { tam = medir(); }, { passive: true });
+
+    function calcular() {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const alto = hero.offsetHeight;
+
+        // 0 = arriba del todo, 1 = hero ya recorrido
+        const t = clamp01(window.scrollY / (alto * 0.72));
+        const e = suave(t);
+
+        // Origen: en escritorio a la derecha del texto; en móvil, centrado arriba
+        const anchoSlot = slot.getBoundingClientRect();
+        const destinoX = anchoSlot.left + anchoSlot.width / 2;
+        const destinoY = anchoSlot.top + anchoSlot.height / 2;
+
+        const origenX = vw >= 1080 ? vw * 0.76 : vw * 0.5;
+        const origenY = vw >= 1080 ? vh * 0.5 : vh * 0.28;
+
+        const escalaFinal = anchoSlot.width / tam;
+
+        const x = lerp(origenX, destinoX, e) - tam / 2;
+        const y = lerp(origenY, destinoY, e) - tam / 2;
+        const s = lerp(1, escalaFinal, e);
+
+        return { x, y, s };
+    }
+
+    function marco() {
+        const { x, y, s } = calcular();
+        const k = listo ? 0.18 : 1;   // el primer cuadro entra sin arrastre
+        ax = lerp(ax, x, k);
+        ay = lerp(ay, y, k);
+        as = lerp(as, s, k);
+        listo = true;
+
+        sigil.style.setProperty('--sx', ax.toFixed(2) + 'px');
+        sigil.style.setProperty('--sy', ay.toFixed(2) + 'px');
+        sigil.style.setProperty('--ss', as.toFixed(4));
+
+        // Mientras se acerca al destino sigue pidiendo cuadros
+        const { x: dx, y: dy, s: ds } = calcular();
+        if (Math.abs(dx - ax) > 0.4 || Math.abs(dy - ay) > 0.4 || Math.abs(ds - as) > 0.002) {
+            requestAnimationFrame(marco);
+        }
+    }
+
+    scrollFx.push(() => requestAnimationFrame(marco));
+    marco();
+}
+
+
+/* ==========================================================================
+   REEL — la sección anclada
+   El scroll no dispara la animación: el scroll ES la animación. Cada
+   proyecto ocupa un tramo del recorrido y entra y sale con él.
+   ========================================================================== */
+
+function initReel() {
+    const reel = document.getElementById('reel');
+    const track = document.getElementById('reelTrack');
+    if (!reel || !track) return;
+
+    const pantallas = [...reel.querySelectorAll('.reel-screen')];
+    const palabras = [...reel.querySelectorAll('.reel-word-item')];
+    const lineas = [...reel.querySelectorAll('.reel-line')];
+    const num = document.getElementById('reelNum');
+    const barra = document.getElementById('reelBar');
+    const fondo = reel.querySelector('.reel-bg');
+    const total = pantallas.length;
+
+    // Las capturas verticales se muestran completas
+    pantallas.forEach(fig => {
+        const img = fig.querySelector('img');
+        const marcar = () => {
+            if (img.naturalHeight > img.naturalWidth) fig.classList.add('is-portrait');
+        };
+        img.complete ? marcar() : img.addEventListener('load', marcar, { once: true });
+    });
+
+    let ultimo = -1;
+
+    function marco() {
+        const caja = track.getBoundingClientRect();
+        const recorrido = caja.height - window.innerHeight;
+
+        // Progreso dentro del tramo anclado
+        const p = clamp01(-caja.top / recorrido);
+
+        // Fuera de vista: no gastar cuadros
+        if (caja.bottom < 0 || caja.top > window.innerHeight) return;
+
+        if (fondo) fondo.style.setProperty('--reel-glow', p > 0.01 && p < 0.99 ? 1 : 0);
+        if (barra) barra.style.setProperty('--p', (p * 100).toFixed(1) + '%');
+
+        // Posición continua sobre el conjunto de proyectos
+        const pos = p * total;
+        const activo = Math.min(total - 1, Math.floor(pos));
+
+        pantallas.forEach((fig, i) => {
+            // d = distancia al centro del tramo de este proyecto
+            const d = pos - i;
+            const dentro = d > -0.35 && d < 1.15;
+
+            if (!dentro) {
+                fig.style.opacity = 0;
+                return;
+            }
+
+            // Entra creciendo, se mantiene, sale encogiendo
+            const entrada = clamp01((d + 0.35) / 0.5);
+            const salida = 1 - clamp01((d - 0.7) / 0.45);
+            const vis = Math.min(entrada, salida);
+
+            fig.style.opacity = vis.toFixed(3);
+            fig.style.setProperty('--sc', (0.9 + vis * 0.1 + d * 0.03).toFixed(4));
+        });
+
+        palabras.forEach((w, i) => {
+            const d = pos - i;
+            const dentro = d > -0.4 && d < 1.2;
+            if (!dentro) { w.style.opacity = 0; return; }
+
+            const entrada = clamp01((d + 0.4) / 0.55);
+            const salida = 1 - clamp01((d - 0.75) / 0.45);
+            const vis = Math.min(entrada, salida);
+
+            w.style.opacity = (vis * 0.9).toFixed(3);
+            // La palabra se mueve al contrario que la pantalla: da profundidad
+            w.style.setProperty('--wy', ((0.5 - d) * 90).toFixed(1) + 'px');
+        });
+
+        if (activo !== ultimo) {
+            ultimo = activo;
+            if (num) num.textContent = String(activo + 1).padStart(2, '0');
+            lineas.forEach((l, i) => l.classList.toggle('is-on', i === activo));
+        }
+    }
+
+    scrollFx.push(marco);
+    marco();
+}
+
+
+/* ==========================================================================
+   BOTONES MAGNÉTICOS
+   ========================================================================== */
+
+function initMagnet() {
+    if (window.matchMedia('(hover: none)').matches) return;
+
+    document.querySelectorAll('.magnet').forEach(el => {
+        el.addEventListener('pointermove', e => {
+            const r = el.getBoundingClientRect();
+            const mx = (e.clientX - r.left - r.width / 2) * 0.25;
+            const my = (e.clientY - r.top - r.height / 2) * 0.35;
+            el.classList.add('is-pulled');
+            el.style.setProperty('--mx', mx.toFixed(1) + 'px');
+            el.style.setProperty('--my', my.toFixed(1) + 'px');
+        });
+
+        el.addEventListener('pointerleave', () => {
+            el.classList.remove('is-pulled');
+            el.style.setProperty('--mx', '0px');
+            el.style.setProperty('--my', '0px');
+        });
+    });
+}
+
+
+/* ==========================================================================
+   TARJETAS VIVAS
+   La tarjeta se inclina siguiendo el cursor y un foco de luz lo acompaña.
+   Es lo que separa una tarjeta plana de una que se siente construida.
+   ========================================================================== */
+
+function initTarjetasVivas() {
+    // En pantallas táctiles no hay cursor que seguir
+    if (window.matchMedia('(hover: none)').matches) return;
+
+    const MAX = 5;   // grados de inclinación
+
+    document.querySelectorAll('.work-card').forEach(card => {
+        let raf = null;
+
+        const mover = e => {
+            if (raf) return;
+            raf = requestAnimationFrame(() => {
+                raf = null;
+                const r = card.getBoundingClientRect();
+                const px = (e.clientX - r.left) / r.width;
+                const py = (e.clientY - r.top) / r.height;
+
+                // Foco de luz
+                card.style.setProperty('--px', (px * 100).toFixed(1) + '%');
+                card.style.setProperty('--py', (py * 100).toFixed(1) + '%');
+
+                // Inclinación: el eje se invierte para que siga al cursor
+                const rx = (0.5 - py) * MAX * 2;
+                const ry = (px - 0.5) * MAX * 2;
+                card.style.transform =
+                    `perspective(1400px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+            });
+        };
+
+        card.addEventListener('pointerenter', () => card.classList.add('is-tilting'));
+        card.addEventListener('pointermove', mover);
+
+        card.addEventListener('pointerleave', () => {
+            card.classList.remove('is-tilting');
+            card.style.transform = '';
+            card.style.removeProperty('--px');
+            card.style.removeProperty('--py');
+        });
+    });
+}
+
+
+/* ==========================================================================
+   ESTRELLAS DEL HERO
+   El campo de partículas conectadas del sitio anterior. Se conserva la
+   mecánica (deriva lenta, líneas entre vecinas, atracción al cursor) y se
+   cambia el color al azul del logo. Va solo dentro del hero.
+   ========================================================================== */
+
+function initEstrellas() {
+    const canvas = document.getElementById('stars');
+    const hero = document.getElementById('top');
+    if (!canvas || !hero) return;
+
+    const ctx = canvas.getContext('2d', { alpha: true });
+    const TINTE = '90, 200, 232';       // el azul hielo del logo
+    const DISTANCIA = 118;              // hasta dónde se unen dos estrellas
+    const RADIO_RATON = 130;
+
+    let estrellas = [];
+    let ancho = 0, alto = 0, dpr = 1;
+    let raton = { x: null, y: null };
+    let corriendo = false;
+    let bucle = null;
+
+    function medir() {
+        const r = hero.getBoundingClientRect();
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        ancho = Math.round(r.width);
+        alto = Math.round(r.height);
+        canvas.width = Math.round(ancho * dpr);
+        canvas.height = Math.round(alto * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function sembrar() {
+        // La cantidad se ajusta al área: en un móvil no hacen falta 60
+        const cuantas = Math.round(Math.min(70, Math.max(24, (ancho * alto) / 22000)));
+        estrellas = Array.from({ length: cuantas }, () => ({
+            x: Math.random() * ancho,
+            y: Math.random() * alto,
+            r: Math.random() * 1.6 + 0.7,
+            vx: (Math.random() - 0.5) * 0.32,
+            vy: (Math.random() - 0.5) * 0.32,
+            brillo: Math.random() * 0.35 + 0.25
+        }));
+    }
+
+    function marco() {
+        ctx.clearRect(0, 0, ancho, alto);
+
+        for (const e of estrellas) {
+            e.x += e.vx;
+            e.y += e.vy;
+
+            // Rebote en los bordes del hero
+            if (e.x < 0 || e.x > ancho) e.vx = -e.vx;
+            if (e.y < 0 || e.y > alto) e.vy = -e.vy;
+
+            // El cursor las atrae un poco
+            if (raton.x !== null) {
+                const dx = raton.x - e.x;
+                const dy = raton.y - e.y;
+                if (dx * dx + dy * dy < RADIO_RATON * RADIO_RATON) {
+                    e.x += dx * 0.012;
+                    e.y += dy * 0.012;
+                }
+            }
+
+            ctx.beginPath();
+            ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${TINTE}, ${e.brillo})`;
+            ctx.fill();
+        }
+
+        // Líneas entre las que están cerca: la constelación
+        ctx.lineWidth = 1;
+        for (let a = 0; a < estrellas.length; a++) {
+            for (let b = a + 1; b < estrellas.length; b++) {
+                const dx = estrellas[a].x - estrellas[b].x;
+                const dy = estrellas[a].y - estrellas[b].y;
+                const d2 = dx * dx + dy * dy;
+                if (d2 > DISTANCIA * DISTANCIA) continue;
+
+                const opacidad = (1 - Math.sqrt(d2) / DISTANCIA) * 0.16;
+                ctx.strokeStyle = `rgba(${TINTE}, ${opacidad})`;
+                ctx.beginPath();
+                ctx.moveTo(estrellas[a].x, estrellas[a].y);
+                ctx.lineTo(estrellas[b].x, estrellas[b].y);
+                ctx.stroke();
+            }
+        }
+
+        bucle = requestAnimationFrame(marco);
+    }
+
+    function arrancar() {
+        if (corriendo) return;
+        corriendo = true;
+        marco();
+    }
+
+    function parar() {
+        corriendo = false;
+        if (bucle) cancelAnimationFrame(bucle);
+        bucle = null;
+    }
+
+    // El cursor solo cuenta cuando está sobre el hero
+    hero.addEventListener('pointermove', e => {
+        const r = hero.getBoundingClientRect();
+        raton.x = e.clientX - r.left;
+        raton.y = e.clientY - r.top;
+    });
+    hero.addEventListener('pointerleave', () => { raton.x = raton.y = null; });
+
+    let remedir;
+    window.addEventListener('resize', () => {
+        clearTimeout(remedir);
+        remedir = setTimeout(() => { medir(); sembrar(); }, 180);
+    }, { passive: true });
+
+    // Fuera de pantalla no se dibuja nada: el hero es la única sección que
+    // lo usa y dejarlo corriendo toda la página gasta batería sin motivo.
+    new IntersectionObserver(([entrada]) => {
+        entrada.isIntersecting ? arrancar() : parar();
+    }, { threshold: 0 }).observe(hero);
+
+    medir();
+    sembrar();
+    arrancar();
+}
+
+
+/* ==========================================================================
+   ARRANQUE
+   ========================================================================== */
+
 document.addEventListener('DOMContentLoaded', () => {
-    attachSoundEffects();
-    highlightActiveLink();
-    initProjectModal();
-    initWhatsappFab();
+    initNav();
+    initReveal();
+    initCounters();
+    initStrip();
+    initFilters();
+    initModal();
+    initWhatsapp();
+    initForm();
+
+    // Movidas por scroll: las controla el visitante, así que se mantienen
+    // aunque el sistema pida menos movimiento.
+    initSigil();
+    initReel();
+    initMagnet();
+    initTarjetasVivas();
+    initEstrellas();
 });
