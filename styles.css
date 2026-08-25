@@ -1961,3 +1961,75 @@ button {
     font-size: var(--step-2);
     color: var(--ink-2);
 }
+
+/* ==========================================================================
+   ESCENAS DE MARCA
+   Ilustraciones generadas a partir del propio logo. Van SIEMPRE detrás de
+   un degradado: una imagen a pelo debajo de texto lo vuelve ilegible.
+   ========================================================================== */
+
+.hero {
+    background-image:
+        linear-gradient(90deg,
+            var(--ground) 4%,
+            rgba(10, 14, 20, 0.92) 34%,
+            rgba(10, 14, 20, 0.45) 62%,
+            rgba(10, 14, 20, 0.12) 82%),
+        linear-gradient(0deg,
+            var(--ground) 4%,
+            rgba(10, 14, 20, 0.86) 20%,
+            rgba(10, 14, 20, 0.4) 34%,
+            transparent 52%),
+        url('assets/hero_dragon.webp');
+    background-size: cover, cover, cover;
+    background-position: center, center, right center;
+    background-repeat: no-repeat;
+}
+
+/* En pantallas angostas el dragón queda detrás del texto: se atenúa mucho
+   más y se corre al borde para que no compita con el titular. */
+@media (max-width: 1000px) {
+    .hero {
+        background-image:
+            linear-gradient(180deg,
+                rgba(10, 14, 20, 0.72) 0%,
+                rgba(10, 14, 20, 0.88) 45%,
+                var(--ground) 88%),
+            url('assets/hero_dragon.webp');
+        background-position: center, 72% center;
+    }
+}
+
+/* --- Contacto ---------------------------------------------------------- */
+
+#contacto {
+    background-image:
+        linear-gradient(90deg,
+            var(--ground) 10%,
+            rgba(10, 14, 20, 0.94) 40%,
+            rgba(10, 14, 20, 0.72) 70%,
+            rgba(10, 14, 20, 0.6) 100%),
+        linear-gradient(0deg, var(--ground), transparent 55%),
+        url('assets/contacto_dragon.webp');
+    background-size: cover, cover, cover;
+    background-position: center, center, right center;
+    background-repeat: no-repeat;
+}
+
+@media (max-width: 1000px) {
+    #contacto {
+        background-image:
+            linear-gradient(180deg,
+                rgba(10, 14, 20, 0.9) 0%,
+                rgba(10, 14, 20, 0.95) 60%,
+                var(--ground) 100%),
+            url('assets/contacto_dragon.webp');
+        background-position: center, 70% center;
+    }
+}
+
+/* El panel del formulario se apoya sobre la escena: necesita cuerpo propio */
+.form {
+    background: rgba(6, 9, 13, 0.86);
+    backdrop-filter: blur(8px);
+}

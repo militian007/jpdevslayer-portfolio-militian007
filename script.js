@@ -660,11 +660,15 @@ function initSigil() {
         const y = lerp(origenY, destinoY, e) - tam / 2;
         const s = lerp(1, escalaFinal, e);
 
-        return { x, y, s };
+        // Arriba del todo el sello no se ve: ahí manda la escena del fondo,
+        // que ya es el mismo dragón. Aparece mientras viaja a la barra.
+        const o = clamp01((t - 0.18) / 0.4);
+
+        return { x, y, s, o };
     }
 
     function marco() {
-        const { x, y, s } = calcular();
+        const { x, y, s, o } = calcular();
         const k = listo ? 0.18 : 1;   // el primer cuadro entra sin arrastre
         ax = lerp(ax, x, k);
         ay = lerp(ay, y, k);
@@ -674,6 +678,7 @@ function initSigil() {
         sigil.style.setProperty('--sx', ax.toFixed(2) + 'px');
         sigil.style.setProperty('--sy', ay.toFixed(2) + 'px');
         sigil.style.setProperty('--ss', as.toFixed(4));
+        sigil.style.opacity = o.toFixed(3);
 
         // Mientras se acerca al destino sigue pidiendo cuadros
         const { x: dx, y: dy, s: ds } = calcular();

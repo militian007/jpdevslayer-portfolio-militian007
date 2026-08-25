@@ -216,6 +216,7 @@ Ordenados por impacto comercial:
 
 | Fecha | Cambio |
 |---|---|
+| 2026-08-25 | **Escenas de marca generadas con IA.** Se añadieron dos ilustraciones al hero y a la sección de contacto, generadas con Higgsfield (Nano Banana Pro) usando `assets/logo.png` **como imagen de referencia**, de modo que el dragón, el monograma JP, la lanza y los circuitos son los de la marca y no un dibujo genérico. Comprimidas de 5.4 MB a 82 KB y de 6.6 MB a 61 KB en WebP (-99%). Van siempre bajo un degradado: una imagen a pelo debajo de texto lo vuelve ilegible. El sello del hero ahora arranca invisible y **aparece mientras viaja a la barra**, porque a tamaño completo se superponía con el dragón del fondo y se veían dos dragones. |
 | 2026-08-20 | **Rediseño desplegado a producción.** Se fusionó `rediseno-2026` en `main`. Los tres precios salen como "A convenir" en lugar de la cifra: el marcador `$PRECIO` se habría visto como un error de programación en la web pública, y las cifras reales todavía no están definidas. Buscar `PRECIO PENDIENTE` en `index.html` para cambiarlas. |
 | 2026-08-20 | **Estrellas del hero y limpieza de capturas.** Se recuperó el campo de partículas conectadas del sitio anterior a petición del cliente, ahora solo dentro del hero, en el azul del logo y sin la cuadrícula del original; se pausa con `IntersectionObserver` cuando el hero sale de pantalla. Se retiraron de Sigmat las capturas `math_5` a `math_8`: no eran pantallas de la app sino del panel de Supabase (editor SQL, avisos de RLS y **una con la clave de API a la vista**), y llevaban descripciones inventadas. Sigmat queda con 4 capturas reales. |
 | 2026-08-20 | **Tarjetas de trabajo rediseñadas y capturas ampliadas.** Las tarjetas pasaron de un bloque plano a una pieza con tres capas: la captura vive dentro de una ventana de navegador dibujada (semáforo y barra de dirección), la tarjeta se inclina en perspectiva siguiendo el cursor y un foco de luz lo acompaña; abajo, una ficha con cifras del proyecto. Capturas por proyecto: Olimpo 5, Sigmat 8, FastChatCenter 7, Asistencia 4. Las de FastChatCenter se generaron levantando el proyecto en local (Docker + backend + frontend) y **anonimizando nombres, teléfonos y correos de contactos reales** antes de guardarlas. Olimpo tiene una sola pantalla real de la app: se compuso una escena 16:9 repitiendo el teléfono en tres profundidades sobre el halo de marca, porque la captura vertical suelta no encajaba con el resto. |
@@ -275,3 +276,21 @@ Se pausa con `IntersectionObserver` cuando el hero sale de pantalla: dejarlo cor
 ### Capturas: verificar antes de publicar
 
 El 2026-08-20 se retiraron cuatro capturas de Sigmat que parecían pantallas de la app y en realidad eran del panel de Supabase, incluida una con la clave de API a la vista. **Antes de añadir una captura, ábrela y míralo**: que sea de la aplicación, no de un panel de administración, y que no tenga claves, correos ni teléfonos.
+
+---
+
+## 15. Las escenas de marca (imágenes generadas con IA)
+
+`assets/hero_dragon.webp` y `assets/contacto_dragon.webp` son ilustraciones generadas con **Higgsfield** (modelo Nano Banana Pro), pasando `assets/logo.png` como imagen de referencia. Por eso conservan el dragón, el monograma JP, la lanza y los circuitos reales de la marca.
+
+**Reglas para no romperlas:**
+
+1. **Nunca van a pelo bajo texto.** Cada una lleva dos degradados encima que oscurecen la zona donde vive el contenido. Si mueves el texto, revisa el contraste antes de dar por bueno el cambio.
+2. **Siempre en WebP y comprimidas.** Las originales pesaban 5.4 MB y 6.6 MB; en la página van a 82 KB y 61 KB. Una imagen de 5 MB en el hero destruye el tiempo de carga, que es de lo que presume esta página.
+3. **A menos de 1000 px de ancho la imagen se atenúa mucho más** y se corre de posición, porque en pantalla angosta queda justo detrás del titular.
+
+**Por qué el sello arranca invisible:** al poner el dragón de fondo, el sello del logo quedaba encima del mismo dragón y se veían dos, con dos monogramas superpuestos. La solución fue que el sello nazca en `opacity: 0` y aparezca mientras el scroll lo lleva a la barra (`initSigil`, la variable `o`). Arriba manda la escena; al bajar aparece el emblema.
+
+### Límite que no se cruza
+
+Estas imágenes son **decoración de marca**. Las capturas de los proyectos tienen que seguir siendo reales: generar pantallas de software con IA y presentarlas como trabajo entregado es el mismo problema de credibilidad que llevó a borrar VORTEX y AEGIS.
