@@ -372,7 +372,7 @@ function fichaDestacada(clave, p, indice) {
 
     return `
         <article class="dest-item${indice === 0 ? ' is-on' : ''}" data-i="${indice}" data-project="${clave}">
-            <div class="dest-hero">
+            <div class="dest-hero" style="--fondo: url('${portada?.src ?? ''}')">
                 <img class="dest-hero-img" src="${portada?.src ?? ''}" alt="${portada?.caption ?? p.title}">
                 <p class="dest-pie">${portada?.caption ?? ''}</p>
             </div>
@@ -469,6 +469,7 @@ function initDestacados() {
 
         grande.src = imagen.src;
         grande.alt = imagen.caption ?? '';
+        grande.parentElement.style.setProperty('--fondo', `url('${imagen.src}')`);
         if (pie) pie.textContent = imagen.caption ?? '';
 
         $$('.dest-mini', ficha).forEach((b, j) => b.classList.toggle('is-on', j === i));
@@ -882,9 +883,9 @@ const PROYECTOS = {
         // unicos ejemplos web son portales dentro de sistemas. Cuando haya un
         // sitio entregado, sus capturas van aca y el carrusel aparece solo.
         images: [
-            { src: 'assets/web_sphere.jpg', caption: 'Sitios escritos desde cero, no plantillas compradas.' },
             { src: 'assets/math_1.png', caption: 'Portal web de Sigmat: acceso con usuario, hecho a medida para una profesora.' },
-            { src: 'assets/math_3.png', caption: 'El mismo portal por dentro: cada quien entra y ve solo lo suyo.' }
+            { src: 'assets/math_3.png', caption: 'El mismo portal por dentro: cada quien entra y ve solo lo suyo.' },
+            { src: 'assets/web_sphere.jpg', caption: 'Sitios escritos desde cero, no plantillas compradas.' }
         ]
     },
 
@@ -914,13 +915,15 @@ const PROYECTOS = {
         // La prueba de que puede hacerlo son los sistemas que ya hizo. Una
         // ilustracion bonita no convence a nadie; una captura de algo que esta
         // funcionando en un negocio real, si.
+        // La portada es una captura de verdad, no la imagen de marca: las
+        // esfericas son casi cuadradas y dejaban franjas a los costados.
         images: [
-            { src: 'assets/app_sphere.jpg', caption: 'Sistemas hechos para la forma de trabajar de cada negocio.' },
+            { src: 'assets/bodega_3_inventario.png', caption: 'Control de inventario: entradas, salidas y existencias al día.' },
             { src: 'assets/fastchat_1.png', caption: 'FastChatCenter: la atención de un negocio entero en una bandeja. Hecho para Viajes Berkana.' },
             { src: 'assets/olimpo_1.png', caption: 'Olimpo: el gimnasio de un entrenador dentro del teléfono de sus clientes.' },
             { src: 'assets/math_3.png', caption: 'Sigmat: panel de cobros y notas para clases particulares.' },
-            { src: 'assets/bodega_3_inventario.png', caption: 'Control de inventario: entradas, salidas y existencias al día.' },
-            { src: 'assets/nexus_2.gif', caption: 'Asistencia: alertas de tardanza sacadas del reloj biométrico, sin revisar nada a mano.' }
+            { src: 'assets/nexus_2.gif', caption: 'Asistencia: alertas de tardanza sacadas del reloj biométrico, sin revisar nada a mano.' },
+            { src: 'assets/app_sphere.jpg', caption: 'Sistemas hechos para la forma de trabajar de cada negocio.' }
         ]
     }
 };

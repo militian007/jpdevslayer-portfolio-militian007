@@ -1361,6 +1361,7 @@ button {
 .sigil-img {
     position: absolute;
     inset: 0;
+    z-index: 1;
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -2048,6 +2049,14 @@ button {
     align-items: stretch;
     gap: clamp(0.5rem, 1.5vw, 1rem);
     margin-top: clamp(1.5rem, 4vw, 2.5rem);
+
+    /* Se sale del ancho del resto del sitio a proposito.
+       El texto de la pagina se lee mejor en una columna angosta, pero una
+       vitrina angosta desperdicia pantalla: las capturas quedan chicas y los
+       vecinos apenas se asoman. Aca manda la imagen, no la lectura. */
+    width: min(1800px, 94vw);
+    margin-inline: auto;
+    max-width: none;
 }
 
 /* --- Las fichas ------------------------------------------------------------ */
@@ -2063,7 +2072,11 @@ button {
 .dest-item {
     grid-area: 1 / 1;
     display: grid;
-    grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+    /* La ficha mas angosta hace dos cosas a la vez: la captura se agranda, y
+       la ficha se acorta (sus capturas chicas encogen con ella). Asi las dos
+       columnas terminan midiendo casi lo mismo y no quedan barras negras
+       arriba y abajo de la imagen. */
+    grid-template-columns: minmax(0, 2.1fr) minmax(320px, 1fr);
 
     opacity: 0;
     visibility: hidden;
@@ -2082,6 +2095,7 @@ button {
     position: relative;
     overflow: hidden;
     background: var(--ground-deep);
+    isolation: isolate;
 
     /* Estira hasta el alto de la ficha de al lado en vez de quedarse en 16/9.
        Con la proporcion fija quedaba un hueco negro debajo de la imagen,
@@ -2089,11 +2103,45 @@ button {
     min-height: clamp(280px, 30vw, 480px);
 }
 
+/* El relleno de los bordes: la MISMA imagen, ampliada y desenfocada.
+   Como cada captura tiene su propia forma, mostrarla entera deja sobra arriba
+   y abajo o a los costados. Rellenarla con negro plano se ve como un error;
+   con la propia imagen borrosa se ve como una decision. Es lo que hacen
+   YouTube y Spotify con las portadas que no encajan.
+
+   El inset negativo es para que el desenfoque no deje un halo claro pegado al
+   borde del marco. */
+.dest-hero::before {
+    content: '';
+    position: absolute;
+    inset: -60px;
+    z-index: 0;
+
+    background-image: var(--fondo);
+    background-size: cover;
+    background-position: center;
+    filter: blur(42px) saturate(0.6) brightness(0.42);
+}
+
 .dest-hero-img {
+    /* Colocada por encima y no dentro del flujo, a proposito.
+       Con la imagen en el flujo, su alto natural decidia el alto de TODO el
+       bloque: las dos imagenes casi cuadradas de los servicios lo estiraban a
+       670px, y las capturas apaisadas de los demas proyectos quedaban con
+       barras negras enormes arriba y abajo. Ahora el alto lo manda la ficha,
+       que es contenido de verdad, y la imagen se acomoda adentro. */
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: top center;
+
+    /* "contain" y no "cover": la imagen entera, aunque sobren bordes.
+       Con "cover" la captura se agrandaba hasta tapar todo el cuadro y se
+       comia los costados: quedaban titulos cortados por la mitad y no se
+       entendia que se estaba mirando. Una captura de un sistema esta para
+       leerse, no para decorar. */
+    object-fit: contain;
+    object-position: center;
     transition: opacity var(--t-mid);
 }
 
@@ -2101,6 +2149,7 @@ button {
    a quien no conoce el sistema. */
 .dest-pie {
     position: absolute;
+    z-index: 2;
     left: 0;
     right: 0;
     bottom: 0;
@@ -2233,7 +2282,9 @@ button {
 
 .dest-vecino {
     position: relative;
-    width: clamp(38px, 6vw, 84px);
+    /* Anchos de verdad: como tiras finas no se entendia que eran productos,
+       parecian un borde decorativo. */
+    width: clamp(70px, 17vw, 330px);
     padding: 0;
     border: 1px solid var(--line);
     border-radius: 12px;
@@ -2281,12 +2332,24 @@ button {
 .dest-puntos {
     grid-column: 1 / -1;
     justify-self: center;
-    margin-top: 1.1rem;
+    margin-top: 1.3rem;
     position: static;
     transform: none;
     background: none;
     backdrop-filter: none;
     padding: 0;
+    gap: 10px;
+}
+
+/* Mas grandes que los de las tarjetas: aca son el control principal para
+   moverse entre productos, no un adorno. */
+.dest-puntos .punto {
+    width: 10px;
+    height: 10px;
+}
+
+.dest-puntos .punto.is-on {
+    width: 30px;
 }
 
 /* --- Pantallas chicas ------------------------------------------------------
