@@ -354,7 +354,28 @@ const PAUSA_DESTACADOS = 6500;
 /** Cuantas capturas chicas entran en la ficha. Steam usa cuatro. */
 const MINIS_POR_FICHA = 4;
 
-function fichaDestacada(clave, p, indice) {
+/**
+ * Que capa le toca a una ficha segun su distancia a la del medio.
+ *
+ * Se mide en circulo: estando en la primera, la ultima aparece a su izquierda.
+ * La vitrina no tiene principio ni final.
+ */
+function capaDeLaFicha(indice, centro, total) {
+    let d = indice - centro;
+    if (d > total / 2) d -= total;
+    if (d < -total / 2) d += total;
+
+    const lado = d < 0 ? 'izq' : 'der';
+    const distancia = Math.abs(d);
+
+    if (distancia === 0) return { clase: 'is-on', lado };
+    if (distancia === 1) return { clase: 'is-lado', lado };
+    if (distancia === 2) return { clase: 'is-fondo', lado };
+
+    return { clase: '', lado };
+}
+
+function fichaDestacada(clave, p, indice, total) {
     const imagenes = p.images ?? [];
     const portada = imagenes[0];
 
@@ -370,8 +391,16 @@ function fichaDestacada(clave, p, indice) {
     const tecnologias = (p.tech ?? []).slice(0, 5).map((x) => `<span>${x}</span>`).join('');
     const accion = p.servicio === true ? 'Pedir presupuesto' : 'Ver el proyecto';
 
+    // La capa se decide al dibujar, no despues.
+    //
+    // Si se asignara despues, la ficha nace en un estado y pasa a otro, y esa
+    // transicion se puede quedar a medias: en una pestana que esta en segundo
+    // plano el navegador congela las animaciones, y la vitrina quedaria toda
+    // amontonada en el medio hasta que alguien mire la pestana.
+    const capa = capaDeLaFicha(indice, 0, total);
+
     return `
-        <article class="dest-item${indice === 0 ? ' is-on' : ''}" data-i="${indice}" data-project="${clave}">
+        <article class="dest-item ${capa.clase}" data-lado="${capa.lado}" data-i="${indice}" data-project="${clave}">
             <div class="dest-hero" style="--fondo: url('${portada?.src ?? ''}')">
                 <img class="dest-hero-img" src="${portada?.src ?? ''}" alt="${portada?.caption ?? p.title}">
                 <p class="dest-pie">${portada?.caption ?? ''}</p>
@@ -410,22 +439,20 @@ function dibujarDestacados() {
     const claves = ORDEN_DEL_CATALOGO.filter((c) => PROYECTOS[c]);
     if (claves.length === 0) return;
 
-    const fichas = claves.map((c, i) => fichaDestacada(c, PROYECTOS[c], i)).join('');
+    const fichas = claves.map((c, i) => fichaDestacada(c, PROYECTOS[c], i, claves.length)).join('');
 
     const puntos = claves
         .map((c, i) => `<button type="button" class="punto${i === 0 ? ' is-on' : ''}" data-ir="${i}" aria-label="${PROYECTOS[c].title}"></button>`)
         .join('');
 
     visor.innerHTML = `
-        <button type="button" class="dest-vecino dest-vecino-izq" data-paso="-1" aria-label="Producto anterior">
-            <img alt="" loading="lazy">
+        <div class="dest-escena">${fichas}</div>
+
+        <button type="button" class="dest-flecha dest-flecha-izq" data-paso="-1" aria-label="Producto anterior">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
         </button>
 
-        <div class="dest-escena">${fichas}</div>
-
-        <button type="button" class="dest-vecino dest-vecino-der" data-paso="1" aria-label="Producto siguiente">
-            <img alt="" loading="lazy">
+        <button type="button" class="dest-flecha dest-flecha-der" data-paso="1" aria-label="Producto siguiente">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
         </button>
 
@@ -440,7 +467,7 @@ function initDestacados() {
     if (fichas.length === 0) return;
 
     const puntos = $$('.dest-puntos .punto', visor);
-    const vecinos = $$('.dest-vecino', visor);
+    const flechas = $$('.dest-flecha', visor);
     const claves = fichas.map((f) => f.dataset.project);
     const quietoPorFavor = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -448,15 +475,26 @@ function initDestacados() {
     let reloj = null;
 
     /**
-     * Las imagenes que se asoman a los costados son la portada del anterior y
-     * la del siguiente: dan a entender que la vitrina sigue para los dos lados.
+     * Reparte las fichas en capas, como un mazo de cartas abierto en abanico.
+     *
+     * La del medio va adelante y entera. A cada lado asoman dos mas, cada vez
+     * mas chicas y mas atras, y cada una tapa la mitad de la que tiene detras.
+     * Las demas se esconden: mostrar siete tarjetas encimadas seria un ruido.
+     *
+     * La distancia se mide en circulo, asi que estando en la primera, la
+     * ultima aparece a su izquierda. La vitrina no tiene principio ni final.
      */
-    function pintarVecinos() {
-        const anterior = PROYECTOS[claves[(actual - 1 + fichas.length) % fichas.length]];
-        const siguiente = PROYECTOS[claves[(actual + 1) % fichas.length]];
+    function repartirCapas() {
+        const total = fichas.length;
 
-        vecinos[0].querySelector('img').src = anterior?.images?.[0]?.src ?? '';
-        vecinos[1].querySelector('img').src = siguiente?.images?.[0]?.src ?? '';
+        fichas.forEach((ficha, i) => {
+            const capa = capaDeLaFicha(i, actual, total);
+
+            ficha.classList.remove('is-on', 'is-lado', 'is-fondo');
+            ficha.dataset.lado = capa.lado;
+
+            if (capa.clase !== '') ficha.classList.add(capa.clase);
+        });
     }
 
     /** Cambia la captura grande por la que corresponde a una chica. */
@@ -478,14 +516,12 @@ function initDestacados() {
     function mostrar(indice) {
         actual = (indice + fichas.length) % fichas.length;
 
-        fichas.forEach((f, i) => f.classList.toggle('is-on', i === actual));
+        repartirCapas();
         puntos.forEach((b, i) => b.classList.toggle('is-on', i === actual));
 
         // Cada ficha vuelve a su primera captura al aparecer: si no, quedaria
         // mostrando la que alguien dejo elegida hace tres vueltas.
         if ($$('.dest-mini', fichas[actual]).length > 0) elegirMini(fichas[actual], 0);
-
-        pintarVecinos();
     }
 
     function arrancar() {
@@ -516,10 +552,20 @@ function initDestacados() {
             boton.addEventListener('click', cambiar);
         });
 
-        ficha.addEventListener('click', () => abrirProyecto(ficha.dataset.project));
+        // La del centro abre el detalle. Las de los costados traen su producto
+        // al centro, que es lo que uno espera al tocar algo que esta a medias.
+        ficha.addEventListener('click', () => {
+            if (ficha.classList.contains('is-on')) {
+                abrirProyecto(ficha.dataset.project);
+                return;
+            }
+
+            frenar();
+            mostrar(fichas.indexOf(ficha));
+        });
     });
 
-    [...vecinos, ...puntos].forEach((boton) => {
+    [...flechas, ...puntos].forEach((boton) => {
         boton.addEventListener('click', (e) => {
             e.stopPropagation();
             frenar();
@@ -561,7 +607,6 @@ function initDestacados() {
         document.hidden ? frenar() : arrancar();
     });
 
-    pintarVecinos();
 }
 
 
