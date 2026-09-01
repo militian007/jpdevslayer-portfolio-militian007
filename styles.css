@@ -1465,187 +1465,6 @@ button {
 }
 
 /* ==========================================================================
-   REEL — SECCIÓN ANCLADA
-   El track es alto; la escena se queda pegada y el scroll mueve la secuencia.
-   ========================================================================== */
-
-.reel {
-    position: relative;
-    z-index: 2;
-    border-top: 1px solid var(--line);
-}
-
-.reel-track { height: 420svh; }
-
-.reel-stage {
-    position: sticky;
-    top: 0;
-    height: 100svh;
-    overflow: hidden;
-    display: grid;
-    place-items: center;
-}
-
-.reel-bg {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse 70% 55% at 50% 45%, rgba(30, 95, 122, 0.22), transparent 70%);
-    opacity: var(--reel-glow, 0);
-    transition: opacity 0.6s var(--ease-out);
-}
-
-/* --- Palabra gigante -------------------------------------------------- */
-.reel-word {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    pointer-events: none;
-}
-
-.reel-word-item {
-    grid-area: 1 / 1;
-    font-family: var(--font-display);
-    font-size: clamp(3.5rem, 15vw, 15rem);
-    font-weight: 900;
-    font-stretch: 125%;
-    letter-spacing: -0.05em;
-    line-height: 1;
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(232, 238, 244, 0.22);
-    white-space: nowrap;
-    opacity: 0;
-    translate: 0 var(--wy, 0px);
-    will-change: opacity, translate;
-}
-
-/* --- Pantallas -------------------------------------------------------- */
-.reel-screens {
-    position: relative;
-    z-index: 2;
-    width: min(900px, 86vw);
-    aspect-ratio: 16 / 9;
-    display: grid;
-}
-
-.reel-screen {
-    grid-area: 1 / 1;
-    margin: 0;
-    border: 1px solid var(--line-strong);
-    border-radius: 6px;
-    overflow: hidden;
-    background: var(--surface);
-    box-shadow: 0 40px 90px rgba(0, 0, 0, 0.55);
-    opacity: 0;
-    scale: var(--sc, 0.94);
-    will-change: opacity, scale;
-}
-
-.reel-screen img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
-    background: var(--ground-deep);
-}
-
-/* Una captura vertical (un teléfono) no lleva marco: queda flotando y deja
-   ver la palabra gigante detrás. Encerrarla en una caja 16:9 dejaba el
-   frame medio vacío. */
-.reel-screen.is-portrait {
-    border: none;
-    background: none;
-    box-shadow: none;
-    place-self: center;
-}
-
-.reel-screen.is-portrait img {
-    /* La altura la manda la pantalla, no el tamaño original de la captura:
-       si no, el teléfono crecía hasta tapar el pie de texto. */
-    width: auto;
-    max-width: 100%;
-    height: auto;
-    max-height: 56svh;
-    margin-inline: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.6));
-}
-
-/* --- Contador y barra -------------------------------------------------- */
-.reel-count {
-    position: absolute;
-    top: clamp(5rem, 12vh, 7rem);
-    left: var(--gutter);
-    z-index: 3;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    color: var(--ink-2);
-    font-variant-numeric: tabular-nums;
-}
-
-.reel-count i {
-    width: 1.4rem;
-    height: 1px;
-    background: var(--line-strong);
-}
-
-.reel-count .reel-total { color: var(--ink-3); }
-.reel-count #reelNum { color: var(--ice); }
-
-.reel-bar {
-    position: absolute;
-    left: var(--gutter);
-    right: var(--gutter);
-    bottom: clamp(4.5rem, 10vh, 6rem);
-    z-index: 3;
-    height: 1px;
-    background: var(--line);
-}
-
-.reel-bar i {
-    display: block;
-    height: 100%;
-    width: var(--p, 0%);
-    background: var(--ice);
-}
-
-/* --- Pie que cambia --------------------------------------------------- */
-.reel-info {
-    position: absolute;
-    left: var(--gutter);
-    right: var(--gutter);
-    bottom: clamp(6.5rem, 14vh, 8.5rem);
-    z-index: 3;
-    display: grid;
-    text-align: center;
-}
-
-.reel-line {
-    grid-area: 1 / 1;
-    color: var(--ink-2);
-    font-size: var(--step-0);
-    max-width: 52ch;
-    margin-inline: auto;
-    opacity: 0;
-    translate: 0 8px;
-    transition: opacity 0.45s var(--ease-out), translate 0.45s var(--ease-out);
-}
-
-.reel-line.is-on { opacity: 1; translate: 0 0; }
-.reel-line b { color: var(--ink); font-weight: 600; }
-
-/* El reel vive del anclaje y del scroll largo: en una pantalla pequeña no
-   tiene recorrido suficiente y las cuatro capturas terminaban una encima de
-   otra. Ahí se retira: la sección de Trabajos muestra los mismos proyectos
-   con más detalle, y la página queda más liviana en el teléfono. */
-@media (max-height: 560px), (max-width: 760px) {
-    .reel { display: none; }
-}
-
-/* ==========================================================================
    BOTÓN MAGNÉTICO
    ========================================================================== */
 
@@ -2199,5 +2018,304 @@ button {
 @media (hover: none) {
     .work-shot .flecha {
         opacity: 1;
+    }
+}
+
+/* ==========================================================================
+   DESTACADOS — LA VITRINA
+   ==========================================================================
+
+   Captura grande a la izquierda, ficha a la derecha, y a los costados se
+   asoma el producto anterior y el siguiente.
+
+   Las fichas se apilan TODAS en la misma celda de la cuadricula
+   (grid-area: 1/1). Asi el bloque mide lo que mide la mas alta y no pega un
+   salto cada vez que cambia de producto, que es el defecto tipico de estos
+   carruseles hechos con posiciones absolutas.
+   ========================================================================== */
+
+.dest {
+    position: relative;
+    z-index: 2;
+    padding: clamp(3.5rem, 8vw, 7rem) 0;
+    border-top: 1px solid var(--line);
+}
+
+.dest-visor {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: stretch;
+    gap: clamp(0.5rem, 1.5vw, 1rem);
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+/* --- Las fichas ------------------------------------------------------------ */
+
+.dest-escena {
+    display: grid;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--surface);
+}
+
+.dest-item {
+    grid-area: 1 / 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.55s var(--ease-out), visibility 0.55s;
+    cursor: pointer;
+}
+
+.dest-item.is-on {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* --- La captura grande ----------------------------------------------------- */
+
+.dest-hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--ground-deep);
+
+    /* Estira hasta el alto de la ficha de al lado en vez de quedarse en 16/9.
+       Con la proporcion fija quedaba un hueco negro debajo de la imagen,
+       porque la ficha con las cuatro capturas siempre es mas alta. */
+    min-height: clamp(280px, 30vw, 480px);
+}
+
+.dest-hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    transition: opacity var(--t-mid);
+}
+
+/* El pie explica QUE se esta viendo. Sin el, una captura suelta no dice nada
+   a quien no conoce el sistema. */
+.dest-pie {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 2.2rem 1.2rem 0.9rem;
+
+    font-size: var(--step--1);
+    line-height: 1.5;
+    color: var(--ink-2);
+    background: linear-gradient(transparent, rgba(6, 9, 13, 0.92) 55%);
+}
+
+/* --- La ficha de la derecha ------------------------------------------------ */
+
+.dest-ficha {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: clamp(1.1rem, 2vw, 1.6rem);
+    background: var(--surface-2);
+    border-left: 1px solid var(--line);
+}
+
+.dest-nombre {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+}
+
+.dest-sub {
+    margin: 0.25rem 0 0;
+    font-size: var(--step--1);
+    color: var(--ink-2);
+}
+
+.dest-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-3);
+}
+
+/* --- Las cuatro capturas chicas -------------------------------------------- */
+
+.dest-minis {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.dest-mini {
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--ground-deep);
+    cursor: pointer;
+    aspect-ratio: 16 / 9;
+    transition: border-color var(--t-fast), opacity var(--t-fast);
+    opacity: 0.62;
+}
+
+.dest-mini img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+}
+
+.dest-mini:hover,
+.dest-mini:focus-visible {
+    opacity: 1;
+    border-color: var(--line-strong);
+}
+
+/* La que se esta viendo arriba queda marcada: si no, no se sabe cual es. */
+.dest-mini.is-on {
+    opacity: 1;
+    border-color: var(--ice);
+}
+
+.dest-mini:focus-visible {
+    outline: 2px solid var(--ice);
+    outline-offset: 2px;
+}
+
+/* --- Pie de la ficha: precio y llamada ------------------------------------- */
+
+.dest-pieficha {
+    margin-top: auto;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+}
+
+.dest-precio {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step-0);
+    color: var(--ice-bright);
+}
+
+.dest-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ice);
+}
+
+.dest-item:hover .dest-cta {
+    color: var(--ice-bright);
+}
+
+/* --- Los vecinos que se asoman --------------------------------------------- */
+
+.dest-vecino {
+    position: relative;
+    width: clamp(38px, 6vw, 84px);
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--ground-deep);
+    cursor: pointer;
+    transition: border-color var(--t-mid);
+}
+
+.dest-vecino img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Apagados a proposito: son una pista de que hay mas, no compiten con el
+       producto que se esta mostrando. */
+    opacity: 0.3;
+    filter: grayscale(0.5);
+    transition: opacity var(--t-mid), filter var(--t-mid);
+}
+
+.dest-vecino svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    color: var(--ink);
+}
+
+.dest-vecino:hover {
+    border-color: var(--ice-deep);
+}
+
+.dest-vecino:hover img {
+    opacity: 0.6;
+    filter: grayscale(0);
+}
+
+.dest-vecino:focus-visible {
+    outline: 2px solid var(--ice);
+    outline-offset: 2px;
+}
+
+/* --- Puntos ---------------------------------------------------------------- */
+
+.dest-puntos {
+    grid-column: 1 / -1;
+    justify-self: center;
+    margin-top: 1.1rem;
+    position: static;
+    transform: none;
+    background: none;
+    backdrop-filter: none;
+    padding: 0;
+}
+
+/* --- Pantallas chicas ------------------------------------------------------
+   La ficha pasa debajo de la captura. Los vecinos se retiran: en un telefono
+   ocupan un ancho que hace falta, y para moverse ya esta el deslizar y los
+   puntos.                                                                   */
+
+@media (max-width: 860px) {
+    .dest-item {
+        grid-template-columns: 1fr;
+    }
+
+    /* Apilada, la imagen ya no tiene una ficha al lado que le marque el alto:
+       vuelve a su proporcion propia. */
+    .dest-hero {
+        aspect-ratio: 16 / 9;
+        min-height: 0;
+    }
+
+    .dest-ficha {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+    }
+
+    .dest-visor {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .dest-vecino {
+        display: none;
     }
 }

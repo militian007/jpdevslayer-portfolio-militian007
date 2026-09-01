@@ -147,52 +147,20 @@
          REEL — seccion anclada. El scroll no hace aparecer cosas:
          el scroll ES el que mueve la secuencia, fotograma a fotograma.
          ================================================================== -->
-    <section class="reel" id="reel" aria-label="Proyectos construidos">
-        <div class="reel-track" id="reelTrack">
-            <div class="reel-stage">
-
-                <div class="reel-bg" aria-hidden="true"></div>
-
-                <!-- Contador -->
-                <div class="reel-count" aria-hidden="true">
-                    <span id="reelNum">01</span><i></i><span class="reel-total">04</span>
-                </div>
-
-                <!-- Barra de avance -->
-                <div class="reel-bar" aria-hidden="true"><i id="reelBar"></i></div>
-
-                <!-- Titulo gigante que entra por cada proyecto -->
-                <div class="reel-word" aria-hidden="true">
-                    <span class="reel-word-item" data-i="0">Olimpo</span>
-                    <span class="reel-word-item" data-i="1">Sigmat</span>
-                    <span class="reel-word-item" data-i="2">FastChat</span>
-                    <span class="reel-word-item" data-i="3">Asistencia</span>
-                </div>
-
-                <!-- Pantallas -->
-                <div class="reel-screens">
-                    <figure class="reel-screen" data-i="0">
-                        <img src="assets/olimpo_1.png" alt="Aplicación Olimpo mostrando la rutina de entrenamiento" loading="lazy">
-                    </figure>
-                    <figure class="reel-screen" data-i="1">
-                        <img src="assets/math_3.png" alt="Panel financiero de Sigmat" loading="lazy">
-                    </figure>
-                    <figure class="reel-screen" data-i="2">
-                        <img src="assets/fastchat_1.png" alt="Bandeja de conversaciones de FastChatCenter" loading="lazy">
-                    </figure>
-                    <figure class="reel-screen" data-i="3">
-                        <img src="assets/nexus_2.gif" alt="Panel de métricas del sistema de asistencia" loading="lazy">
-                    </figure>
-                </div>
-
-                <!-- Pie que cambia con cada proyecto -->
-                <div class="reel-info">
-                    <p class="reel-line" data-i="0"><b>Entrenadores personales.</b> Rutinas, dietas, progreso y cobros. Web, Android y iPhone.</p>
-                    <p class="reel-line" data-i="1"><b>Clases particulares.</b> Alumnos, asistencia, notas y pagos, cada uno viendo solo lo suyo.</p>
-                    <p class="reel-line" data-i="2"><b>Atención al cliente.</b> WhatsApp, Messenger e Instagram en una sola bandeja, con varios agentes.</p>
-                    <p class="reel-line" data-i="3"><b>Recursos humanos.</b> Lee el reloj biométrico y calcula retardos sin revisión manual.</p>
+    <!-- Destacados: la vitrina, al estilo de la portada de Steam.
+         Lo dibuja script.js desde la misma lista PROYECTOS que el catalogo,
+         asi un cambio de texto o de imagen se ve en los dos lados. -->
+    <section class="dest" id="destacados" aria-label="Productos destacados">
+        <div class="shell">
+            <div class="band-head rise">
+                <p class="tag">Destacados</p>
+                <div>
+                    <h2 class="band-title">Mirá lo que hago, por dentro.</h2>
+                    <p class="band-lead">Sistemas funcionando y productos que podés pedirme. Tocá las capturas chicas para verlas grandes.</p>
                 </div>
             </div>
+
+            <div class="dest-visor" id="destVisor"></div>
         </div>
     </section>
 

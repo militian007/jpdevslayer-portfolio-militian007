@@ -332,6 +332,239 @@ function dibujarCatalogo() {
 
 
 /* ==========================================================================
+   DESTACADOS — LA VITRINA
+   ==========================================================================
+
+   La misma idea que la portada de Steam: una captura grande a la izquierda y
+   una ficha a la derecha con el nombre, cuatro capturas chicas, las
+   tecnologias y el precio. A los costados se asoma el producto anterior y el
+   siguiente, apagados, para que se note que hay mas.
+
+   Antes aca habia una seccion que avanzaba con el scroll: quedaba pegada a la
+   pantalla y las capturas pasaban al bajar. Se veia bien, pero tenia dos
+   problemas: no se podia volver atras, y en el telefono se escondia entera
+   porque no habia recorrido suficiente. Esta version se maneja con flechas,
+   funciona en cualquier pantalla, y sale de la misma lista PROYECTOS que el
+   catalogo: ya no hay dos textos que mantener en dos lugares.
+   ========================================================================== */
+
+/** Cada cuanto pasa al siguiente. Mas lento que las tarjetas: aca hay mas para leer. */
+const PAUSA_DESTACADOS = 6500;
+
+/** Cuantas capturas chicas entran en la ficha. Steam usa cuatro. */
+const MINIS_POR_FICHA = 4;
+
+function fichaDestacada(clave, p, indice) {
+    const imagenes = p.images ?? [];
+    const portada = imagenes[0];
+
+    const minis = imagenes
+        .slice(0, MINIS_POR_FICHA)
+        .map((img, i) => `
+            <button type="button" class="dest-mini${i === 0 ? ' is-on' : ''}" data-mini="${i}"
+                    aria-label="Ver captura ${i + 1} de ${p.title}">
+                <img src="${img.src}" alt="" loading="lazy">
+            </button>`)
+        .join('');
+
+    const tecnologias = (p.tech ?? []).slice(0, 5).map((x) => `<span>${x}</span>`).join('');
+    const accion = p.servicio === true ? 'Pedir presupuesto' : 'Ver el proyecto';
+
+    return `
+        <article class="dest-item${indice === 0 ? ' is-on' : ''}" data-i="${indice}" data-project="${clave}">
+            <div class="dest-hero">
+                <img class="dest-hero-img" src="${portada?.src ?? ''}" alt="${portada?.caption ?? p.title}">
+                <p class="dest-pie">${portada?.caption ?? ''}</p>
+            </div>
+
+            <aside class="dest-ficha">
+                <div class="dest-cabeza">
+                    <h3 class="dest-nombre">${p.title}</h3>
+                    <p class="dest-sub">${p.subtitle ?? ''}</p>
+                </div>
+
+                <div class="dest-meta">
+                    ${p.specs?.['Estado'] ? `<span class="pill">${p.specs['Estado']}</span>` : ''}
+                    ${p.specs?.['Sector'] ? `<span>${p.specs['Sector']}</span>` : ''}
+                </div>
+
+                ${minis ? `<div class="dest-minis">${minis}</div>` : ''}
+
+                <div class="work-tech">${tecnologias}</div>
+
+                <div class="dest-pieficha">
+                    ${p.precio ? `<p class="dest-precio">${p.precio}</p>` : ''}
+                    <span class="dest-cta">
+                        ${accion}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                    </span>
+                </div>
+            </aside>
+        </article>`;
+}
+
+function dibujarDestacados() {
+    const visor = $('#destVisor');
+    if (!visor) return;
+
+    const claves = ORDEN_DEL_CATALOGO.filter((c) => PROYECTOS[c]);
+    if (claves.length === 0) return;
+
+    const fichas = claves.map((c, i) => fichaDestacada(c, PROYECTOS[c], i)).join('');
+
+    const puntos = claves
+        .map((c, i) => `<button type="button" class="punto${i === 0 ? ' is-on' : ''}" data-ir="${i}" aria-label="${PROYECTOS[c].title}"></button>`)
+        .join('');
+
+    visor.innerHTML = `
+        <button type="button" class="dest-vecino dest-vecino-izq" data-paso="-1" aria-label="Producto anterior">
+            <img alt="" loading="lazy">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+        </button>
+
+        <div class="dest-escena">${fichas}</div>
+
+        <button type="button" class="dest-vecino dest-vecino-der" data-paso="1" aria-label="Producto siguiente">
+            <img alt="" loading="lazy">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+        </button>
+
+        <div class="puntos dest-puntos">${puntos}</div>`;
+}
+
+function initDestacados() {
+    const visor = $('#destVisor');
+    if (!visor) return;
+
+    const fichas = $$('.dest-item', visor);
+    if (fichas.length === 0) return;
+
+    const puntos = $$('.dest-puntos .punto', visor);
+    const vecinos = $$('.dest-vecino', visor);
+    const claves = fichas.map((f) => f.dataset.project);
+    const quietoPorFavor = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let actual = 0;
+    let reloj = null;
+
+    /**
+     * Las imagenes que se asoman a los costados son la portada del anterior y
+     * la del siguiente: dan a entender que la vitrina sigue para los dos lados.
+     */
+    function pintarVecinos() {
+        const anterior = PROYECTOS[claves[(actual - 1 + fichas.length) % fichas.length]];
+        const siguiente = PROYECTOS[claves[(actual + 1) % fichas.length]];
+
+        vecinos[0].querySelector('img').src = anterior?.images?.[0]?.src ?? '';
+        vecinos[1].querySelector('img').src = siguiente?.images?.[0]?.src ?? '';
+    }
+
+    /** Cambia la captura grande por la que corresponde a una chica. */
+    function elegirMini(ficha, i) {
+        const imagen = PROYECTOS[ficha.dataset.project]?.images?.[i];
+        if (!imagen) return;
+
+        const grande = ficha.querySelector('.dest-hero-img');
+        const pie = ficha.querySelector('.dest-pie');
+
+        grande.src = imagen.src;
+        grande.alt = imagen.caption ?? '';
+        if (pie) pie.textContent = imagen.caption ?? '';
+
+        $$('.dest-mini', ficha).forEach((b, j) => b.classList.toggle('is-on', j === i));
+    }
+
+    function mostrar(indice) {
+        actual = (indice + fichas.length) % fichas.length;
+
+        fichas.forEach((f, i) => f.classList.toggle('is-on', i === actual));
+        puntos.forEach((b, i) => b.classList.toggle('is-on', i === actual));
+
+        // Cada ficha vuelve a su primera captura al aparecer: si no, quedaria
+        // mostrando la que alguien dejo elegida hace tres vueltas.
+        if ($$('.dest-mini', fichas[actual]).length > 0) elegirMini(fichas[actual], 0);
+
+        pintarVecinos();
+    }
+
+    function arrancar() {
+        if (quietoPorFavor || reloj !== null) return;
+        reloj = setInterval(() => mostrar(actual + 1), PAUSA_DESTACADOS);
+    }
+
+    function frenar() {
+        if (reloj === null) return;
+        clearInterval(reloj);
+        reloj = null;
+    }
+
+    // Las capturas chicas cambian la grande al pasar el mouse, como en Steam.
+    // Tambien al tocarlas, porque en un telefono no existe "pasar el mouse".
+    fichas.forEach((ficha) => {
+        $$('.dest-mini', ficha).forEach((boton, i) => {
+            const cambiar = (e) => {
+                // La ficha entera abre el detalle. Sin frenar el clic, elegir
+                // una captura abriria la ventana en vez de cambiar la imagen.
+                if (e) e.stopPropagation();
+                frenar();
+                elegirMini(ficha, i);
+            };
+
+            boton.addEventListener('mouseenter', () => cambiar());
+            boton.addEventListener('focus', () => cambiar());
+            boton.addEventListener('click', cambiar);
+        });
+
+        ficha.addEventListener('click', () => abrirProyecto(ficha.dataset.project));
+    });
+
+    [...vecinos, ...puntos].forEach((boton) => {
+        boton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            frenar();
+
+            mostrar(boton.dataset.ir !== undefined
+                ? Number(boton.dataset.ir)
+                : actual + Number(boton.dataset.paso));
+        });
+    });
+
+    visor.addEventListener('mouseenter', frenar);
+    visor.addEventListener('mouseleave', arrancar);
+    visor.addEventListener('focusin', frenar);
+    visor.addEventListener('focusout', arrancar);
+
+    // Deslizar con el dedo en el telefono.
+    let inicioX = null;
+
+    visor.addEventListener('touchstart', (e) => {
+        inicioX = e.touches[0]?.clientX ?? null;
+        frenar();
+    }, { passive: true });
+
+    visor.addEventListener('touchend', (e) => {
+        if (inicioX === null) return;
+
+        const recorrido = (e.changedTouches[0]?.clientX ?? inicioX) - inicioX;
+        if (Math.abs(recorrido) > 45) mostrar(actual + (recorrido < 0 ? 1 : -1));
+
+        inicioX = null;
+    }, { passive: true });
+
+    // Solo se anima lo que esta a la vista, y solo con la pestana adelante.
+    new IntersectionObserver((entradas) => {
+        entradas.forEach((e) => (e.isIntersecting ? arrancar() : frenar()));
+    }, { threshold: 0.3 }).observe(visor);
+
+    document.addEventListener('visibilitychange', () => {
+        document.hidden ? frenar() : arrancar();
+    });
+
+    pintarVecinos();
+}
+
+
+/* ==========================================================================
    CARRUSEL DE CADA TARJETA
    ==========================================================================
 
@@ -697,6 +930,19 @@ const PROYECTOS = {
    MODAL DE PROYECTO
    ========================================================================== */
 
+/**
+ * Abre el detalle de un proyecto desde cualquier parte de la pagina.
+ *
+ * La funcion de verdad vive encerrada dentro de initModal, que es donde tiene
+ * sentido que este. Esta variable es la puerta: initModal la llena al arrancar,
+ * y asi los destacados pueden abrir el mismo detalle sin duplicar nada.
+ *
+ * Empieza sin hacer nada por si alguien la llama antes de que el modal exista:
+ * un clic que no responde es molesto, pero un error que corta el resto de la
+ * pagina es peor.
+ */
+let abrirProyecto = () => {};
+
 function initModal() {
     const modal = $('#modal');
     const veil = $('#modalVeil');
@@ -779,6 +1025,9 @@ function initModal() {
         document.body.style.overflow = '';
         lastFocused?.focus();
     }
+
+    // Se conecta la puerta que usan los destacados.
+    abrirProyecto = (clave) => open(clave, null);
 
     $$('.work-card').forEach(card => {
         const fire = () => open(card.dataset.project, card);
@@ -1066,96 +1315,7 @@ function initSigil() {
 }
 
 
-/* ==========================================================================
-   REEL — la sección anclada
-   El scroll no dispara la animación: el scroll ES la animación. Cada
-   proyecto ocupa un tramo del recorrido y entra y sale con él.
-   ========================================================================== */
 
-function initReel() {
-    const reel = document.getElementById('reel');
-    const track = document.getElementById('reelTrack');
-    if (!reel || !track) return;
-
-    const pantallas = [...reel.querySelectorAll('.reel-screen')];
-    const palabras = [...reel.querySelectorAll('.reel-word-item')];
-    const lineas = [...reel.querySelectorAll('.reel-line')];
-    const num = document.getElementById('reelNum');
-    const barra = document.getElementById('reelBar');
-    const fondo = reel.querySelector('.reel-bg');
-    const total = pantallas.length;
-
-    // Las capturas verticales se muestran completas
-    pantallas.forEach(fig => {
-        const img = fig.querySelector('img');
-        const marcar = () => {
-            if (img.naturalHeight > img.naturalWidth) fig.classList.add('is-portrait');
-        };
-        img.complete ? marcar() : img.addEventListener('load', marcar, { once: true });
-    });
-
-    let ultimo = -1;
-
-    function marco() {
-        const caja = track.getBoundingClientRect();
-        const recorrido = caja.height - window.innerHeight;
-
-        // Progreso dentro del tramo anclado
-        const p = clamp01(-caja.top / recorrido);
-
-        // Fuera de vista: no gastar cuadros
-        if (caja.bottom < 0 || caja.top > window.innerHeight) return;
-
-        if (fondo) fondo.style.setProperty('--reel-glow', p > 0.01 && p < 0.99 ? 1 : 0);
-        if (barra) barra.style.setProperty('--p', (p * 100).toFixed(1) + '%');
-
-        // Posición continua sobre el conjunto de proyectos
-        const pos = p * total;
-        const activo = Math.min(total - 1, Math.floor(pos));
-
-        pantallas.forEach((fig, i) => {
-            // d = distancia al centro del tramo de este proyecto
-            const d = pos - i;
-            const dentro = d > -0.35 && d < 1.15;
-
-            if (!dentro) {
-                fig.style.opacity = 0;
-                return;
-            }
-
-            // Entra creciendo, se mantiene, sale encogiendo
-            const entrada = clamp01((d + 0.35) / 0.5);
-            const salida = 1 - clamp01((d - 0.7) / 0.45);
-            const vis = Math.min(entrada, salida);
-
-            fig.style.opacity = vis.toFixed(3);
-            fig.style.setProperty('--sc', (0.9 + vis * 0.1 + d * 0.03).toFixed(4));
-        });
-
-        palabras.forEach((w, i) => {
-            const d = pos - i;
-            const dentro = d > -0.4 && d < 1.2;
-            if (!dentro) { w.style.opacity = 0; return; }
-
-            const entrada = clamp01((d + 0.4) / 0.55);
-            const salida = 1 - clamp01((d - 0.75) / 0.45);
-            const vis = Math.min(entrada, salida);
-
-            w.style.opacity = (vis * 0.9).toFixed(3);
-            // La palabra se mueve al contrario que la pantalla: da profundidad
-            w.style.setProperty('--wy', ((0.5 - d) * 90).toFixed(1) + 'px');
-        });
-
-        if (activo !== ultimo) {
-            ultimo = activo;
-            if (num) num.textContent = String(activo + 1).padStart(2, '0');
-            lineas.forEach((l, i) => l.classList.toggle('is-on', i === activo));
-        }
-    }
-
-    scrollFx.push(marco);
-    marco();
-}
 
 
 /* ==========================================================================
@@ -1370,10 +1530,12 @@ function initEstrellas() {
 
 document.addEventListener('DOMContentLoaded', () => {
     dibujarCatalogo();
+    dibujarDestacados();
     initNav();
     initReveal();
     initCounters();
     initStrip();
+    initDestacados();
     initCarruseles();
     initFilters();
     initModal();
@@ -1383,7 +1545,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Movidas por scroll: las controla el visitante, así que se mantienen
     // aunque el sistema pida menos movimiento.
     initSigil();
-    initReel();
     initMagnet();
     initTarjetasVivas();
     initEstrellas();
