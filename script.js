@@ -171,6 +171,132 @@ function initStrip() {
 
 
 /* ==========================================================================
+   EL CATALOGO SE DIBUJA SOLO
+   ==========================================================================
+
+   Antes cada tarjeta estaba escrita a mano en el index.html, y ademas sus
+   datos estaban otra vez aca abajo en PROYECTOS. La misma informacion en dos
+   lugares: cambiabas una y te olvidabas de la otra.
+
+   Ahora PROYECTOS manda. Las tarjetas se arman solas desde esa lista.
+
+   ## Para agregar un producto al catalogo
+
+   1. Copia un bloque de PROYECTOS, pegalo y cambiale el texto.
+   2. Agrega su nombre a ORDEN_DEL_CATALOGO, en la posicion que quieras.
+
+   No hay que tocar el HTML. El orden de esa lista es el orden en que salen.
+
+   ## El dia que quieras cargarlos desde tu panel
+
+   Todo lo que hay que cambiar es de donde sale PROYECTOS: en vez de estar
+   escrito aca, se pide al servidor. El resto de la pagina no se entera.
+   ========================================================================== */
+
+/**
+ * Lo que se le dice al cliente en TODOS los proyectos.
+ *
+ * Va en un solo lugar a proposito: si algun dia cambia la forma de trabajar, se
+ * cambia aca y se actualiza en los siete proyectos de una. Repetirla en cada
+ * uno garantiza que tarde o temprano queden distintas entre si.
+ */
+const NOTA_A_MEDIDA =
+    'Todos los sistemas se adaptan a lo que necesita cada cliente: se agregan, se quitan ' +
+    'o se cambian funciones segun tu forma de trabajar. El precio y las condiciones se ' +
+    'acuerdan segun el alcance, antes de empezar.';
+
+/**
+ * El orden en que salen en la pagina. Mover un nombre aca lo mueve en el sitio.
+ * Si un nombre no esta en esta lista, no se muestra.
+ */
+const ORDEN_DEL_CATALOGO = [
+    'fastchat',
+    'programa-a-medida',
+    'olimpo',
+    'web-a-medida',
+    'sigma',
+    'asistencia',
+    'domino'
+];
+
+/** Cada tarjeta necesita saber a que filtro responde. */
+function tarjetaDeProyecto(clave, p) {
+    const ancha = p.ancha === true ? ' is-wide' : '';
+    const portada = p.images?.[0];
+    const etiqueta = p.specs?.['Estado'] ?? '';
+    const rubro = p.specs?.['Sector'] ?? '';
+
+    // Los servicios no son casos que se puedan "ver": se piden.
+    const accion = p.servicio === true ? 'Pedir presupuesto' : 'Ver el caso';
+
+    const numeros = (p.datos ?? [])
+        .map(([valor, texto]) => `<span><b>${valor}</b>${texto}</span>`)
+        .join('');
+
+    const tecnologias = (p.tech ?? []).map((x) => `<span>${x}</span>`).join('');
+
+    return `
+        <article class="work-card${ancha} rise" data-category="${p.categoria}" data-project="${clave}"
+                 tabindex="0" role="button" aria-label="Ver detalles de ${p.title}">
+            <div class="work-frame">
+                <div class="work-bar" aria-hidden="true">
+                    <span class="work-dots"><i></i><i></i><i></i></span>
+                    <span class="work-url">${p.barra ?? p.title}</span>
+                </div>
+                <div class="work-shot">
+                    <img src="${portada?.src ?? ''}" alt="${portada?.caption ?? p.title}" loading="lazy">
+                </div>
+            </div>
+            <div class="work-body">
+                <div class="work-meta">
+                    ${etiqueta ? `<span class="pill">${etiqueta}</span>` : ''}
+                    ${rubro ? `<span>${rubro}</span>` : ''}
+                </div>
+                <h3 class="work-title">${p.title}</h3>
+                <p class="work-desc">${p.resumen}</p>
+                <div class="work-tech">${tecnologias}</div>
+                ${p.precio ? `<p class="work-precio">${p.precio}</p>` : ''}
+                <div class="work-foot">
+                    <div class="work-nums">${numeros}</div>
+                    <span class="work-open">
+                        ${accion}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                    </span>
+                </div>
+            </div>
+        </article>`;
+}
+
+/**
+ * Dibuja el catalogo entero.
+ *
+ * Tiene que correr ANTES que initFilters e initModal: esas dos buscan las
+ * tarjetas en la pagina, y si todavia no existen no encuentran nada.
+ */
+function dibujarCatalogo() {
+    const contenedor = $('#work');
+    if (!contenedor) return;
+
+    const tarjetas = ORDEN_DEL_CATALOGO
+        .map((clave) => {
+            const proyecto = PROYECTOS[clave];
+
+            if (!proyecto) {
+                // Un hueco silencioso es peor que un aviso: asi se ve el nombre
+                // mal escrito en vez de preguntarse por que falta una tarjeta.
+                console.error(`[Catalogo] "${clave}" esta en ORDEN_DEL_CATALOGO pero no existe en PROYECTOS.`);
+                return '';
+            }
+
+            return tarjetaDeProyecto(clave, proyecto);
+        })
+        .join('');
+
+    contenedor.innerHTML = tarjetas;
+}
+
+
+/* ==========================================================================
    FILTROS DE TRABAJOS
    ========================================================================== */
 
@@ -208,6 +334,9 @@ function initFilters() {
 
 const PROYECTOS = {
     olimpo: {
+        categoria: 'apps',
+        barra: 'olimpo · rutina del día',
+        datos: [['3', 'plataformas'], ['1.300+', 'ejercicios']],
         title: 'Olimpo',
         subtitle: 'Plataforma para entrenadores personales',
         estado: 'construccion',
@@ -237,6 +366,9 @@ const PROYECTOS = {
     },
 
     sigma: {
+        categoria: 'apps',
+        barra: 'sigmat · panel financiero',
+        datos: [['2', 'portales'], ['RLS', 'en base'], ['8', 'capturas']],
         title: 'Sigmat',
         subtitle: 'Portal académico y de cobros',
         resumen: 'Portal a medida para clases particulares de matemática. La profesora registra alumnos, toma asistencia, carga calificaciones y verifica los pagos mensuales. Cada estudiante entra con su propio usuario y ve únicamente su información.',
@@ -263,6 +395,10 @@ const PROYECTOS = {
     },
 
     fastchat: {
+        categoria: 'apps',
+        barra: 'fastchatcenter · bandeja compartida',
+        datos: [['3', 'canales'], ['Multi', 'empresa'], ['7', 'capturas']],
+        ancha: true,
         title: 'FastChatCenter',
         subtitle: 'Central de atención multicanal',
         resumen: 'Todas las conversaciones de un negocio en una sola bandeja: WhatsApp, Messenger e Instagram juntos, atendidos por varios agentes a la vez sin pisarse. Cada mensaje se convierte en un ticket que se asigna, se responde y se cierra, con historial completo por contacto.',
@@ -293,6 +429,9 @@ const PROYECTOS = {
     },
 
     asistencia: {
+        categoria: 'apps',
+        barra: 'asistencia · motor analítico',
+        datos: [['Excel', 'de entrada'], ['0', 'revisión manual']],
         title: 'Asistencia',
         subtitle: 'Motor de análisis de personal',
         resumen: 'Toma los reportes en bruto del reloj biométrico y los convierte en información útil. Agrupa las marcaciones de cada persona por día, deduce la entrada y la salida, las compara contra el horario asignado con su tolerancia, y saca las alertas de tardanza e inasistencia sin revisión manual.',
@@ -315,6 +454,90 @@ const PROYECTOS = {
             { src: 'assets/nexus_1.gif', caption: 'Carga de los reportes del reloj biométrico.' },
             { src: 'assets/nexus_3.gif', caption: 'Configuración: mapeo de columnas y tolerancia de horarios.' },
             { src: 'assets/asistencia_1.png', caption: 'Punto de entrada: se arrastra el reporte de Hik-Connect y el motor hace el resto.' }
+        ]
+    },
+
+    domino: {
+        categoria: 'games',
+        barra: 'dominó online · mesa de juego',
+        datos: [['28', 'fichas'], ['3', 'modos'], ['100', 'puntos por partida']],
+        precio: 'Próximamente',
+        title: 'Dominó Online',
+        subtitle: 'Dominó doble 6 multijugador',
+        resumen: 'Dominó clásico doble seis para jugar por internet, solo contra bots o en equipos con otras personas. Sala con código para invitar a quien quieras, partidas a 100 puntos y todas las reglas de siempre: empieza el doble más alto, sin compra, y el tranque se resuelve por puntos.',
+        specs: {
+            'Sector': 'Videojuegos',
+            'Estado': 'En desarrollo',
+            'Modos': '1v3 bots · 2v2 bots · 2v2 personas',
+            'Conexión': 'Tiempo real (WebSockets)'
+        },
+        features: [
+            '<strong>Tres modos de juego:</strong> solo contra tres bots, con un amigo contra dos bots, o dos contra dos entre personas en una sala con código.',
+            '<strong>Reglas del dominó de toda la vida:</strong> 28 fichas, siete por jugador, arranca el doble más alto, sin compra, y si todos pasan se tranca y gana el equipo con menos puntos.',
+            '<strong>Partidas por equipos:</strong> los puntos se suman de a dos y se juega a 100.',
+            '<strong>Todo en tiempo real:</strong> cada ficha que pone alguien aparece al instante en la mesa de los demás.'
+        ],
+        tech: ['Node.js', 'Express', 'Socket.io', 'React', 'Vite', 'Tailwind CSS', 'SQLite'],
+        images: [
+            { src: 'assets/domino_1.webp', caption: 'La mesa: fichas en juego, las de los rivales boca abajo y la que tenés en la mano.' },
+            { src: 'assets/domino_2.webp', caption: 'Las 28 fichas del doble seis, tal como se ven en el juego.' }
+        ]
+    },
+
+    'web-a-medida': {
+        categoria: 'web',
+        barra: 'tu sitio · hecho a tu medida',
+        datos: [['A medida', 'sin plantillas'], ['Tuyo', 'el código'], ['0', 'mensualidad obligatoria']],
+        servicio: true,
+        ancha: true,
+        precio: 'Se acuerda con vos',
+        title: 'Crea tu página web',
+        subtitle: 'Un sitio hecho para lo que vos vendés',
+        resumen: 'Tu página, escrita desde cero para tu negocio y no armada con una plantilla que usan otros mil. Rápida, que se vea bien en el teléfono, y pensada para que quien entre haga lo que vos necesitás que haga: escribirte, reservar, comprar o encontrarte.',
+        specs: {
+            'Sector': 'Para cualquier rubro',
+            'Estado': 'Disponible',
+            'Precio': 'Según lo que necesites',
+            'Plazo': 'Se acuerda antes de empezar'
+        },
+        features: [
+            '<strong>El precio se conversa:</strong> no hay una lista de paquetes. Me contás qué necesitás, te digo qué cuesta y cuánto tarda, y recién ahí decidís.',
+            '<strong>Nada de plantillas:</strong> se diseña para tu negocio. Si mañana querés cambiar algo, se cambia — no hay un tema comprado que lo impida.',
+            '<strong>Que la encuentren:</strong> preparada para que Google la lea bien y para que cargue rápido, que es lo que hace que la gente no se vaya.',
+            '<strong>Se ve bien en el teléfono:</strong> la mayoría de tus visitas van a entrar desde ahí.',
+            '<strong>El código es tuyo:</strong> queda en tu repositorio. No quedás atado a mí ni a ninguna plataforma.'
+        ],
+        tech: ['HTML', 'CSS', 'JavaScript', 'React', 'Next.js', 'Diseño propio', 'Optimización de carga'],
+        images: [
+            { src: 'assets/web_sphere.jpg', caption: 'Sitios hechos a medida, no plantillas.' }
+        ]
+    },
+
+    'programa-a-medida': {
+        categoria: 'apps',
+        barra: 'tu sistema · hecho a tu medida',
+        datos: [['A medida', 'sin plantillas'], ['Tuyo', 'el código'], ['Web', 'y móvil']],
+        servicio: true,
+        precio: 'Se acuerda con vos',
+        title: 'Crea tu programa',
+        subtitle: 'El sistema que tu negocio necesita',
+        resumen: 'Un programa hecho para cómo trabajás vos, no un software genérico al que tenés que adaptarte. Control de inventario, clientes, cobros, turnos, reportes: lo que haga falta. Funciona desde la computadora y desde el teléfono, y crece a medida que crece tu negocio.',
+        specs: {
+            'Sector': 'Para cualquier rubro',
+            'Estado': 'Disponible',
+            'Precio': 'Según lo que necesites',
+            'Plazo': 'Se acuerda antes de empezar'
+        },
+        features: [
+            '<strong>El precio se conversa:</strong> primero entendemos qué problema hay que resolver. Después te paso qué cuesta y cuánto tarda, sin sorpresas después.',
+            '<strong>Hecho para tu forma de trabajar:</strong> si tu negocio hace algo distinto al resto, el sistema lo hace también. Eso es justo lo que un software enlatado no puede.',
+            '<strong>Cada quien ve lo suyo:</strong> perfiles y permisos, para que un empleado no vea lo que no tiene que ver.',
+            '<strong>Tus datos, respaldados:</strong> copias automáticas desde el primer día, porque perder la información del negocio no se arregla con nada.',
+            '<strong>El código es tuyo:</strong> queda en tu repositorio, con la documentación de cómo funciona.'
+        ],
+        tech: ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Aplicación instalable', 'Respaldos automáticos'],
+        images: [
+            { src: 'assets/app_sphere.jpg', caption: 'Sistemas hechos para cómo trabaja cada negocio.' }
         ]
     }
 };
@@ -367,6 +590,7 @@ function initModal() {
                     <p>${p.resumen}</p>
                     <h4>Qué resuelve</h4>
                     <ul class="feat">${p.features.map(f => `<li>${f}</li>`).join('')}</ul>
+                    <p class="nota-medida">${NOTA_A_MEDIDA}</p>
                 </div>
                 <div>
                     <h4>Ficha</h4>
@@ -995,6 +1219,7 @@ function initEstrellas() {
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+    dibujarCatalogo();
     initNav();
     initReveal();
     initCounters();

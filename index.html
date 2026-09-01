@@ -272,8 +272,8 @@
             <div class="band-head rise">
                 <p class="tag">Trabajos</p>
                 <div>
-                    <h2 class="band-title">Sistemas que hoy están en uso.</h2>
-                    <p class="band-lead">Cada uno resolvió un problema concreto de un negocio concreto. Toca cualquiera para ver las pantallas reales y cómo está construido por dentro.</p>
+                    <h2 class="band-title">Lo que hago y lo que ya está hecho.</h2>
+                    <p class="band-lead">Sistemas funcionando en negocios reales, y lo que puedo construir para vos. Toca cualquiera para ver las pantallas y cómo está armado por dentro. Todo se adapta a lo que necesites: el precio y las condiciones se acuerdan antes de empezar.</p>
                 </div>
             </div>
 
@@ -284,147 +284,16 @@
                 <button class="chip" data-filter="games">Videojuegos</button>
             </div>
 
-            <div class="work" id="work">
-                <article class="work-card is-wide rise" data-category="apps" data-project="fastchat" tabindex="0" role="button" aria-label="Ver detalles de FastChatCenter">
-                    <div class="work-frame">
-                        <div class="work-bar" aria-hidden="true">
-                            <span class="work-dots"><i></i><i></i><i></i></span>
-                            <span class="work-url">fastchatcenter · bandeja compartida</span>
-                        </div>
-                        <div class="work-shot">
-                            <img src="assets/fastchat_1.png" alt="Bandeja compartida de FastChatCenter" loading="lazy">
-                        </div>
-                    </div>
-                    <div class="work-body">
-                        <div class="work-meta">
-                            <span class="pill">En producción</span>
-                            <span>Atención al cliente</span>
-                        </div>
-                        <h3 class="work-title">FastChatCenter</h3>
-                        <p class="work-desc">WhatsApp, Messenger e Instagram en una sola bandeja. Varios agentes atienden a la vez sin pisarse: cada mensaje se vuelve un ticket que se asigna, se responde y se cierra. Con chatbots por departamento, campañas e informes de tiempo de respuesta.</p>
-                        <div class="work-tech">
-                            <span>React</span><span>TypeScript</span><span>Node.js</span><span>MySQL</span><span>WebSockets</span><span>API de Meta</span>
-                        </div>
-                        <div class="work-foot">
-                            <div class="work-nums">
-                                <span><b>3</b>canales</span>
-                                <span><b>Multi</b>empresa</span>
-                                <span><b>7</b>capturas</span>
-                            </div>
-                            <span class="work-open">
-                                Ver el caso
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
-                            </span>
-                        </div>
-                    </div>
-                </article>
+            <!-- Las tarjetas las dibuja script.js desde la lista PROYECTOS.
+                 Para agregar un producto no se toca este archivo: se agrega
+                 alli y se pone su nombre en ORDEN_DEL_CATALOGO. -->
+            <div class="work" id="work"></div>
 
-                <article class="work-card rise" data-category="apps" data-project="olimpo" tabindex="0" role="button" aria-label="Ver detalles de Olimpo">
-                    <div class="work-frame">
-                        <div class="work-bar" aria-hidden="true">
-                            <span class="work-dots"><i></i><i></i><i></i></span>
-                            <span class="work-url">olimpo · rutina del día</span>
-                        </div>
-                        <div class="work-shot">
-                            <img src="assets/olimpo_1.png" alt="Aplicación Olimpo mostrando la rutina del día" loading="lazy">
-                        </div>
-                    </div>
-                    <div class="work-body">
-                        <div class="work-meta">
-                            <span class="pill is-wip">En construcción</span>
-                            <span>Fitness</span>
-                        </div>
-                        <h3 class="work-title">Olimpo</h3>
-                        <p class="work-desc">El gimnasio entero de un entrenador dentro del teléfono de sus clientes: rutinas, dietas con calorías, progreso con fotos, cobro de cuotas y chat en vivo.</p>
-                        <div class="work-tech">
-                            <span>Next.js</span><span>TypeScript</span><span>PostgreSQL</span><span>Android</span><span>iOS</span>
-                        </div>
-                        <div class="work-foot">
-                            <div class="work-nums">
-                                <span><b>3</b>plataformas</span>
-                                <span><b>1.300+</b>ejercicios</span>
-                            </div>
-                            <span class="work-open">
-                                Ver el caso
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
-                            </span>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="work-card rise" style="--d: 90ms" data-category="apps" data-project="sigma" tabindex="0" role="button" aria-label="Ver detalles de Sigmat">
-                    <div class="work-frame">
-                        <div class="work-bar" aria-hidden="true">
-                            <span class="work-dots"><i></i><i></i><i></i></span>
-                            <span class="work-url">sigmat · panel financiero</span>
-                        </div>
-                        <div class="work-shot">
-                            <img src="assets/math_3.png" alt="Panel financiero de Sigmat" loading="lazy">
-                        </div>
-                    </div>
-                    <div class="work-body">
-                        <div class="work-meta">
-                            <span class="pill">Entregado</span>
-                            <span>Educación</span>
-                        </div>
-                        <h3 class="work-title">Sigmat</h3>
-                        <p class="work-desc">Portal para clases particulares. La profesora registra alumnos, asistencia, notas y pagos; cada estudiante entra con su usuario y ve solo lo suyo, con la seguridad aplicada en la base de datos.</p>
-                        <div class="work-tech">
-                            <span>JavaScript</span><span>Supabase Auth</span><span>PostgreSQL</span><span>RLS</span>
-                        </div>
-                        <div class="work-foot">
-                            <div class="work-nums">
-                                <span><b>2</b>portales</span>
-                                <span><b>RLS</b>en base</span>
-                                <span><b>8</b>capturas</span>
-                            </div>
-                            <span class="work-open">
-                                Ver el caso
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
-                            </span>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="work-card is-wide rise" style="--d: 180ms" data-category="apps" data-project="asistencia" tabindex="0" role="button" aria-label="Ver detalles de Asistencia">
-                    <div class="work-frame">
-                        <div class="work-bar" aria-hidden="true">
-                            <span class="work-dots"><i></i><i></i><i></i></span>
-                            <span class="work-url">asistencia · motor analítico</span>
-                        </div>
-                        <div class="work-shot">
-                            <img src="assets/nexus_2.gif" alt="Panel de métricas del sistema de asistencia" loading="lazy">
-                        </div>
-                    </div>
-                    <div class="work-body">
-                        <div class="work-meta">
-                            <span class="pill">En producción</span>
-                            <span>Recursos humanos</span>
-                        </div>
-                        <h3 class="work-title">Asistencia</h3>
-                        <p class="work-desc">Lee el Excel del reloj biométrico tal como sale, agrupa las marcaciones de cada persona por día y calcula los retardos contra su horario. Lo que era una revisión manual de horas queda resuelto en segundos.</p>
-                        <div class="work-tech">
-                            <span>React</span><span>Vite</span><span>SheetJS</span><span>Tailwind</span>
-                        </div>
-                        <div class="work-foot">
-                            <div class="work-nums">
-                                <span><b>Excel</b>de entrada</span>
-                                <span><b>0</b>revisión manual</span>
-                            </div>
-                            <span class="work-open">
-                                Ver el caso
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
-                            </span>
-                        </div>
-                    </div>
-                </article>
-
-                <div class="empty" id="empty" hidden>
-                    <p class="tag">Sin casos públicos</p>
-                    <h3>Todavía no hay trabajos publicados en esta categoría.</h3>
-                    <p>Los proyectos de esta área están en desarrollo o bajo acuerdo de confidencialidad con el cliente.</p>
-                    <a href="#contacto" class="btn btn-line">Sé el primero</a>
-                </div>
+            <div class="empty" id="empty" hidden>
+                <p class="tag">Sin casos públicos</p>
+                <h3>Todavía no hay trabajos publicados en esta categoría.</h3>
+                <p>Los proyectos de esta área están en desarrollo o bajo acuerdo de confidencialidad con el cliente.</p>
+                <a href="#contacto" class="btn btn-line">Sé el primero</a>
             </div>
         </div>
     </section>

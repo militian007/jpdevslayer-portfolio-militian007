@@ -2033,3 +2033,61 @@ button {
     background: rgba(6, 9, 13, 0.86);
     backdrop-filter: blur(8px);
 }
+
+/* ==========================================================================
+   CATALOGO: LO QUE SE OFRECE, NO SOLO LO QUE SE HIZO
+   ==========================================================================
+
+   La seccion de trabajos nacio como portafolio: mostraba sistemas ya
+   entregados. Ahora tambien ofrece productos ("Crea tu pagina web", "Crea tu
+   programa") y un juego en desarrollo.
+
+   Un producto que se ofrece necesita dos cosas que un caso terminado no: decir
+   cuanto cuesta, y aclarar que se adapta. Eso es lo que se resuelve aca.
+   ========================================================================== */
+
+/* El precio, con el peso visual que tiene en cualquier tienda: es de lo
+   primero que se busca, asi que no se esconde entre el resto del texto. */
+.work-precio {
+    margin: 0.9rem 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--step-0);
+    letter-spacing: -0.01em;
+    color: var(--ice-bright);
+}
+
+/* "Se acuerda con vos" es una respuesta, no una evasiva: se explica al lado
+   para que no parezca que se esconde el precio. */
+.work-precio::after {
+    content: ' · según el alcance';
+    font-family: var(--font-body);
+    font-size: var(--step--1);
+    letter-spacing: 0;
+    color: var(--ink-3);
+}
+
+/* Las tarjetas de producto no llevan captura de pantalla sino una imagen de
+   marca, que es cuadrada. Sin esto la tarjeta queda desproporcionadamente
+   alta al lado de las de los casos reales. */
+.work-card[data-project$="-a-medida"] .work-shot {
+    max-height: 260px;
+}
+
+.work-card[data-project$="-a-medida"] .work-shot img {
+    object-fit: cover;
+    object-position: center;
+}
+
+/* La nota de "se adapta a lo que necesitas", dentro del detalle del proyecto.
+   Va separada del resto: no es una funcion mas del sistema, es una condicion
+   de trabajo que aplica a todos por igual. */
+.nota-medida {
+    margin-top: 1.6rem;
+    padding: 1rem 1.1rem;
+    border-left: 2px solid var(--ice-deep);
+    background: var(--ice-dim);
+    border-radius: 0 8px 8px 0;
+    font-size: var(--step--1);
+    line-height: 1.65;
+    color: var(--ink-2);
+}
