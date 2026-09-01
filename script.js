@@ -219,6 +219,43 @@ const ORDEN_DEL_CATALOGO = [
     'domino'
 ];
 
+/**
+ * Las imagenes de una tarjeta, en forma de carrusel.
+ *
+ * Con una sola imagen no dibuja controles: no hay entre que moverse, y unas
+ * flechas que no llevan a ningun lado confunden.
+ */
+function galeriaDeTarjeta(p) {
+    const imagenes = p.images ?? [];
+
+    if (imagenes.length === 0) return '';
+
+    const laminas = imagenes
+        .map((img, i) => `
+            <img class="lamina${i === 0 ? ' is-on' : ''}" src="${img.src}"
+                 alt="${img.caption ?? p.title}" loading="${i === 0 ? 'lazy' : 'lazy'}">`)
+        .join('');
+
+    if (imagenes.length === 1) return laminas;
+
+    const puntos = imagenes
+        .map((_, i) => `<button type="button" class="punto${i === 0 ? ' is-on' : ''}" data-ir="${i}" aria-label="Imagen ${i + 1}"></button>`)
+        .join('');
+
+    // Las flechas y los puntos viven DENTRO de la tarjeta, que entera es un
+    // boton que abre el detalle. Por eso cada uno frena el clic: si no, mover
+    // el carrusel abriria la ventana del proyecto.
+    return `
+        ${laminas}
+        <button type="button" class="flecha flecha-atras" data-paso="-1" aria-label="Imagen anterior">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+        </button>
+        <button type="button" class="flecha flecha-adelante" data-paso="1" aria-label="Imagen siguiente">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+        </button>
+        <div class="puntos">${puntos}</div>`;
+}
+
 /** Cada tarjeta necesita saber a que filtro responde. */
 function tarjetaDeProyecto(clave, p) {
     const ancha = p.ancha === true ? ' is-wide' : '';
@@ -243,9 +280,7 @@ function tarjetaDeProyecto(clave, p) {
                     <span class="work-dots"><i></i><i></i><i></i></span>
                     <span class="work-url">${p.barra ?? p.title}</span>
                 </div>
-                <div class="work-shot">
-                    <img src="${portada?.src ?? ''}" alt="${portada?.caption ?? p.title}" loading="lazy">
-                </div>
+                <div class="work-shot">${galeriaDeTarjeta(p)}</div>
             </div>
             <div class="work-body">
                 <div class="work-meta">
@@ -293,6 +328,107 @@ function dibujarCatalogo() {
         .join('');
 
     contenedor.innerHTML = tarjetas;
+}
+
+
+/* ==========================================================================
+   CARRUSEL DE CADA TARJETA
+   ==========================================================================
+
+   Se mueve solo, y ademas se puede mover a mano. Las tres reglas que hacen
+   que no moleste:
+
+   1. Se FRENA cuando el mouse esta encima o cuando algo adentro tiene el foco.
+      Un carrusel que se mueve mientras la persona esta mirando una imagen es
+      de las cosas mas molestas que hay en una pagina.
+   2. Se frena tambien si la pestana no esta a la vista: no tiene sentido
+      gastar bateria animando algo que nadie ve.
+   3. Respeta a quien pidio menos movimiento en su sistema operativo. Para
+      algunas personas el movimiento automatico produce mareo de verdad.
+   ========================================================================== */
+
+/** Cada cuanto pasa a la siguiente imagen, en milisegundos. */
+const PAUSA_DEL_CARRUSEL = 4500;
+
+function initCarruseles() {
+    // Quien pidio "menos movimiento" en su sistema no recibe animacion sola:
+    // las flechas y los puntos le siguen funcionando.
+    const quietoPorFavor = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    $$('.work-shot').forEach((marco) => {
+        const laminas = $$('.lamina', marco);
+        if (laminas.length < 2) return;
+
+        const puntos = $$('.punto', marco);
+        let actual = 0;
+        let reloj = null;
+
+        function mostrar(indice) {
+            actual = (indice + laminas.length) % laminas.length;
+
+            laminas.forEach((l, i) => l.classList.toggle('is-on', i === actual));
+            puntos.forEach((b, i) => b.classList.toggle('is-on', i === actual));
+        }
+
+        function arrancar() {
+            if (quietoPorFavor || reloj !== null) return;
+            reloj = setInterval(() => mostrar(actual + 1), PAUSA_DEL_CARRUSEL);
+        }
+
+        function frenar() {
+            if (reloj === null) return;
+            clearInterval(reloj);
+            reloj = null;
+        }
+
+        // Mover a mano frena el automatico: la persona tomo el control.
+        $$('.flecha, .punto', marco).forEach((boton) => {
+            boton.addEventListener('click', (e) => {
+                // La tarjeta entera abre el detalle. Sin esto, tocar una flecha
+                // abriria la ventana en vez de pasar la imagen.
+                e.stopPropagation();
+                e.preventDefault();
+                frenar();
+
+                mostrar(boton.dataset.ir !== undefined
+                    ? Number(boton.dataset.ir)
+                    : actual + Number(boton.dataset.paso));
+            });
+        });
+
+        marco.addEventListener('mouseenter', frenar);
+        marco.addEventListener('mouseleave', arrancar);
+        marco.addEventListener('focusin', frenar);
+        marco.addEventListener('focusout', arrancar);
+
+        // Deslizar con el dedo en el telefono.
+        let inicioX = null;
+
+        marco.addEventListener('touchstart', (e) => {
+            inicioX = e.touches[0]?.clientX ?? null;
+            frenar();
+        }, { passive: true });
+
+        marco.addEventListener('touchend', (e) => {
+            if (inicioX === null) return;
+
+            const recorrido = (e.changedTouches[0]?.clientX ?? inicioX) - inicioX;
+
+            // 40px: menos que eso suele ser un toque, no un deslizar.
+            if (Math.abs(recorrido) > 40) mostrar(actual + (recorrido < 0 ? 1 : -1));
+
+            inicioX = null;
+        }, { passive: true });
+
+        // Solo se anima lo que esta a la vista.
+        new IntersectionObserver((entradas) => {
+            entradas.forEach((e) => (e.isIntersecting ? arrancar() : frenar()));
+        }, { threshold: 0.35 }).observe(marco);
+
+        document.addEventListener('visibilitychange', () => {
+            document.hidden ? frenar() : arrancar();
+        });
+    });
 }
 
 
@@ -505,11 +641,17 @@ const PROYECTOS = {
             '<strong>Nada de plantillas:</strong> se diseña para tu negocio. Si mañana querés cambiar algo, se cambia — no hay un tema comprado que lo impida.',
             '<strong>Que la encuentren:</strong> preparada para que Google la lea bien y para que cargue rápido, que es lo que hace que la gente no se vaya.',
             '<strong>Se ve bien en el teléfono:</strong> la mayoría de tus visitas van a entrar desde ahí.',
-            '<strong>El código es tuyo:</strong> queda en tu repositorio. No quedás atado a mí ni a ninguna plataforma.'
+            '<strong>El código es tuyo:</strong> queda en tu repositorio. No quedás atado a mí ni a ninguna plataforma.',
+            '<strong>El ejemplo lo estás viendo:</strong> esta misma página está hecha así, a mano, sin plantilla.'
         ],
         tech: ['HTML', 'CSS', 'JavaScript', 'React', 'Next.js', 'Diseño propio', 'Optimización de carga'],
+        // PENDIENTE: faltan capturas de sitios hechos para clientes. Hoy los
+        // unicos ejemplos web son portales dentro de sistemas. Cuando haya un
+        // sitio entregado, sus capturas van aca y el carrusel aparece solo.
         images: [
-            { src: 'assets/web_sphere.jpg', caption: 'Sitios hechos a medida, no plantillas.' }
+            { src: 'assets/web_sphere.jpg', caption: 'Sitios escritos desde cero, no plantillas compradas.' },
+            { src: 'assets/math_1.png', caption: 'Portal web de Sigmat: acceso con usuario, hecho a medida para una profesora.' },
+            { src: 'assets/math_3.png', caption: 'El mismo portal por dentro: cada quien entra y ve solo lo suyo.' }
         ]
     },
 
@@ -536,8 +678,16 @@ const PROYECTOS = {
             '<strong>El código es tuyo:</strong> queda en tu repositorio, con la documentación de cómo funciona.'
         ],
         tech: ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Aplicación instalable', 'Respaldos automáticos'],
+        // La prueba de que puede hacerlo son los sistemas que ya hizo. Una
+        // ilustracion bonita no convence a nadie; una captura de algo que esta
+        // funcionando en un negocio real, si.
         images: [
-            { src: 'assets/app_sphere.jpg', caption: 'Sistemas hechos para cómo trabaja cada negocio.' }
+            { src: 'assets/app_sphere.jpg', caption: 'Sistemas hechos para la forma de trabajar de cada negocio.' },
+            { src: 'assets/fastchat_1.png', caption: 'FastChatCenter: la atención de un negocio entero en una bandeja. Hecho para Viajes Berkana.' },
+            { src: 'assets/olimpo_1.png', caption: 'Olimpo: el gimnasio de un entrenador dentro del teléfono de sus clientes.' },
+            { src: 'assets/math_3.png', caption: 'Sigmat: panel de cobros y notas para clases particulares.' },
+            { src: 'assets/bodega_3_inventario.png', caption: 'Control de inventario: entradas, salidas y existencias al día.' },
+            { src: 'assets/nexus_2.gif', caption: 'Asistencia: alertas de tardanza sacadas del reloj biométrico, sin revisar nada a mano.' }
         ]
     }
 };
@@ -1224,6 +1374,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initReveal();
     initCounters();
     initStrip();
+    initCarruseles();
     initFilters();
     initModal();
     initWhatsapp();
